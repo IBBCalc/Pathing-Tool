@@ -755,19 +755,19 @@ export class TitlePhase extends Phase {
     console.log(`Starting 0 lures and ${charms} charms ${new Date().toLocaleString()}`);
     this.encounterList = [];
     this.GenerateBiomes(startingBiome, 0);
-    this.StoreEncounters(this.encounterList, `0${charms}`);
+    this.StoreEncounters(`0${charms}`);
 
     console.log(`Starting 1 lures and ${charms} charms ${new Date().toLocaleString()}`);
     this.encounterList = [];
     this.scene.InsertLure();
     this.GenerateBiomes(startingBiome, 0);
-    this.StoreEncounters(this.encounterList, `1${charms}`);
+    this.StoreEncounters(`1${charms}`);
 
     console.log(`Starting 2 lures and ${charms} charms ${new Date().toLocaleString()}`);
     this.encounterList = [];
     this.scene.InsertSuperLure();
     this.GenerateBiomes(startingBiome, 0);
-    this.StoreEncounters(this.encounterList, `2${charms}`);
+    this.StoreEncounters(`2${charms}`);
 
     // Only generate wave 10 for 3 lures.
     console.log(`Starting 3 lures and ${charms} charms ${new Date().toLocaleString()}`);
@@ -777,7 +777,7 @@ export class TitlePhase extends Phase {
     this.scene.currentBattle.waveIndex = 9;
     this.scene.arena.updatePoolsForTimeOfDay();
     this.GenerateBattle();
-    this.StoreEncounters(this.encounterList, `3${charms}`);
+    this.StoreEncounters(`3${charms}`);
 
     var output = JSON.parse(localStorage.getItem("scouting")!) as string[][];
     console.log("All scouting data:", output);
@@ -785,7 +785,7 @@ export class TitlePhase extends Phase {
     this.scene.ui.showText("DONE! Copy the data from the console and then you can refresh this page.", null);
   }
 
-  StoreEncounters(encounterList: string[], lurecharm: string) {
+  StoreEncounters(lurecharm: string) {
     var output = JSON.parse(localStorage.getItem("scouting")!) as string[][];
     output.push([`start${lurecharm}`]);
     output.push(this.encounterList);
