@@ -452,13 +452,39 @@ export class TitlePhase extends Phase {
     }, {
       label: "Scouting",
       handler: () => {
-        this.scene.sessionSlotId = 0;
-        this.scene.gameData.loadSession(this.scene, this.scene.sessionSlotId, undefined, undefined).then((success: boolean) => {
-          this.ScoutingWithoutUI();
-        }).catch(err => {
-          console.error(err);
-          this.scene.ui.showText(i18next.t("menu:failedToLoadSession"), null);
+        const charmOptions: OptionSelectItem[] = [];
+        charmOptions.push({
+          label: "0 charms",
+          handler: () => {
+            this.InitScouting(0);
+            return true;
+          }
+        }, {
+          label: "1 charm",
+          handler: () => {
+            this.InitScouting(1);
+            return true;
+          }
+        }, {
+          label: "2 charms",
+          handler: () => {
+            this.InitScouting(2);
+            return true;
+          }
+        }, {
+          label: "3 charms",
+          handler: () => {
+            this.InitScouting(3);
+            return true;
+          }
+        }, {
+          label: "4 charms",
+          handler: () => {
+            this.InitScouting(4);
+            return true;
+          }
         });
+        this.scene.ui.setOverlayMode(Mode.OPTION_SELECT, { options: charmOptions });
         return true;
       }
     }, {
@@ -702,54 +728,70 @@ export class TitlePhase extends Phase {
     super.end();
   }
 
+  InitScouting(charms: number) {
+    this.scene.sessionSlotId = 0;
+    this.scene.gameData.loadSession(this.scene, this.scene.sessionSlotId, undefined, undefined).then((success: boolean) => {
+      this.ScoutingWithoutUI(charms);
+    }).catch(err => {
+      console.error(err);
+      this.scene.ui.showText(`something went wrong, see console error`, null);
+    });
+  }
+
 	private encounterList: string[] = [];
-  ScoutingWithoutUI() {
-    var startingBiome = this.scene.arena.biomeType
+  ScoutingWithoutUI(charms: number) {
+    var startingBiome = this.scene.arena.biomeType;
     var output: string[][] = [];
+    localStorage.setItem("scouting", JSON.stringify(output));
+    output = [];
 
-    // Run for 0,1,2,3,4 charms.
-    for (var i = 0; i < 5; i++) {
-      // Remove any lures or charms
-      this.scene.RemoveModifiers()
+    // Remove any lures or charms
+    this.scene.RemoveModifiers();
 
-      // Add 0 to 4 charms, depending on the loop
-      if (i > 0) this.scene.InsertAbilityCharm(i);
+    // Add 0 to 4 charms
+    if (charms > 0) this.scene.InsertAbilityCharm(charms);
 
-      // Keep track of encounters, Generate Biomes and encounters
-      this.encounterList = [];
-      this.GenerateBiomes(startingBiome, 0);
-      output.push([`start0${i}`]);
-      output.push(this.encounterList)
-      output.push([`end0${i}`]);
+    // Keep track of encounters, Generate Biomes and encounters
+    console.log(`Starting 0 lures and ${charms} charms ${new Date().toLocaleString()}`);
+    this.encounterList = [];
+    this.GenerateBiomes(startingBiome, 0);
+    this.StoreEncounters(this.encounterList, `0${charms}`);
 
-      this.encounterList = [];
-      this.scene.InsertLure();
-      this.GenerateBiomes(startingBiome, 0);
-      output.push([`start1${i}`]);
-      output.push(this.encounterList)
-      output.push([`end1${i}`]);
+    console.log(`Starting 1 lures and ${charms} charms ${new Date().toLocaleString()}`);
+    this.encounterList = [];
+    this.scene.InsertLure();
+    this.GenerateBiomes(startingBiome, 0);
+    this.StoreEncounters(this.encounterList, `1${charms}`);
 
-      this.encounterList = [];
-      this.scene.InsertSuperLure();
-      this.GenerateBiomes(startingBiome, 0);
-      output.push([`start2${i}`]);
-      output.push(this.encounterList)
-      output.push([`end2${i}`]);
+    console.log(`Starting 2 lures and ${charms} charms ${new Date().toLocaleString()}`);
+    this.encounterList = [];
+    this.scene.InsertSuperLure();
+    this.GenerateBiomes(startingBiome, 0);
+    this.StoreEncounters(this.encounterList, `2${charms}`);
 
-      // Only generate wave 10 for 3 lures.
-      this.encounterList = [];
-      this.scene.InsertMaxLure();
-      this.scene.newArena(startingBiome);
-      this.scene.currentBattle.waveIndex = 9;
-      this.scene.arena.updatePoolsForTimeOfDay()
-      this.GenerateBattle();
-      output.push([`start3${i}`]);
-      output.push(this.encounterList)
-      output.push([`end3${i}`]);
-    }
+    // Only generate wave 10 for 3 lures.
+    console.log(`Starting 3 lures and ${charms} charms ${new Date().toLocaleString()}`);
+    this.encounterList = [];
+    this.scene.InsertMaxLure();
+    this.scene.newArena(startingBiome);
+    this.scene.currentBattle.waveIndex = 9;
+    this.scene.arena.updatePoolsForTimeOfDay();
+    this.GenerateBattle();
+    this.StoreEncounters(this.encounterList, `3${charms}`);
 
+    var output = JSON.parse(localStorage.getItem("scouting")!) as string[][];
     console.log("All scouting data:", output);
+    output = [];
     this.scene.ui.showText("DONE! Copy the data from the console and then you can refresh this page.", null);
+  }
+
+  StoreEncounters(encounterList: string[], lurecharm: string) {
+    var output = JSON.parse(localStorage.getItem("scouting")!) as string[][];
+    output.push([`start${lurecharm}`]);
+    output.push(this.encounterList);
+    output.push([`end${lurecharm}`]);
+    localStorage.setItem("scouting", JSON.stringify(output));
+    output = [];
   }
 
   GenerateBattle(nolog: boolean = false) {
