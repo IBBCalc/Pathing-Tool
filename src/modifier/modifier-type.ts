@@ -1262,7 +1262,10 @@ class TmModifierTypeGenerator extends ModifierTypeGenerator {
         console.log("Generating item: TM (Tier: " + Utils.getEnumKeys(ModifierTier)[tier].toLowerCase() + ")");
       }
 
-      const partyMemberCompatibleTms = party.map(p => (p as PlayerPokemon).compatibleTms.filter(tm => !p.moveset.find(m => m?.moveId === tm)));
+      const partyMemberCompatibleTms = party.map(p => {
+        const previousLevelMoves = p.getLearnableLevelMoves();
+        return (p as PlayerPokemon).compatibleTms.filter(tm => !p.moveset.find(m => m?.moveId === tm) && !previousLevelMoves.find(lm=>lm === tm));
+      });
       const tierUniqueCompatibleTms = partyMemberCompatibleTms.flat().filter(tm => tmPoolTiers[tm] === tier).filter(tm => !allMoves[tm].name.endsWith(" (N)")).filter((tm, i, array) => array.indexOf(tm) === i);
       if (!tierUniqueCompatibleTms.length) {
         return null;
