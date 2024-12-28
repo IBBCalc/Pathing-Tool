@@ -31,6 +31,7 @@ import { biomeLinks } from "#app/data/balance/biomes.js";
 import { applyAbAttrs, SyncEncounterNatureAbAttr } from "#app/data/ability.js";
 import { TrainerSlot } from "#app/data/trainer-config.js";
 import { BattleSpec } from "#app/enums/battle-spec.js";
+import { Moves } from "#app/enums/moves.js";
 
 
 export class TitlePhase extends Phase {
@@ -836,6 +837,9 @@ export class TitlePhase extends Phase {
         `Passive Ability: ${enemy.getPassiveAbility().name} Nature: ${Nature[enemy.nature]} Gender: ${Gender[enemy.gender]} Rarity: ${LoggerTools.rarities[e]} AbilityIndex: ${enemy.abilityIndex} ID: ${enemy.id}`;
         this.encounterList.push(text);
         console.log(text);
+        if (battle.waveIndex == 50) {
+          console.log(enemy.moveset.map(m => Moves[m?.moveId ?? 0]))
+        }
       }
     })
   }
