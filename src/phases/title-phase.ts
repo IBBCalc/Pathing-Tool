@@ -32,6 +32,7 @@ import { applyAbAttrs, SyncEncounterNatureAbAttr } from "#app/data/ability.js";
 import { TrainerSlot } from "#app/data/trainer-config.js";
 import { BattleSpec } from "#app/enums/battle-spec.js";
 import { Moves } from "#app/enums/moves.js";
+import { Type } from "#app/enums/type.js";
 
 
 export class TitlePhase extends Phase {
@@ -742,9 +743,21 @@ export class TitlePhase extends Phase {
 	private encounterList: string[] = [];
   ScoutingWithoutUI(charms: number) {
     var startingBiome = this.scene.arena.biomeType;
+
+    var starters: string[] = []
+    var party = this.scene.getPlayerParty();
+    party.forEach(p => {
+      starters.push(`Pokemon: ${getPokemonNameWithAffix(p)} ` +
+        `Form: ${p.getSpeciesForm().getSpriteAtlasPath(false, p.formIndex)} Species ID: ${p.species.speciesId} Stats: ${p.stats} IVs: ${p.ivs} Ability: ${p.getAbility().name} ` +
+        `Passive Ability: ${p.getPassiveAbility().name} Nature: ${Nature[p.nature]} Gender: ${Gender[p.gender]} Rarity: undefined AbilityIndex: ${p.abilityIndex} `+
+        `ID: ${p.id} Type: ${p.getTypes().map(t => Type[t]).join(",")} Moves: ${p.getMoveset().map(m => Moves[m?.moveId ?? 0]).join(",")}`);
+    });
+
     var output: string[][] = [];
+    output.push([`startstarters`]);
+    output.push(starters);
+    output.push([`endstarters`]);
     localStorage.setItem("scouting", JSON.stringify(output));
-    output = [];
 
     // Remove any lures or charms
     this.scene.RemoveModifiers();
@@ -833,12 +846,14 @@ export class TitlePhase extends Phase {
 
         // Store encounters in a list, basically CSV (uses regex in sheets), but readable as well
         var text = `Wave: ${this.scene.currentBattle.waveIndex} Biome: ${Biome[this.scene.arena.biomeType]} Pokemon: ${getPokemonNameWithAffix(enemy)} ` +
-        `Form: ${enemy.species.forms[enemy.formIndex]?.formName} Species ID: ${enemy.species.speciesId} Stats: ${enemy.stats} IVs: ${enemy.ivs} Ability: ${enemy.getAbility().name} ` +
-        `Passive Ability: ${enemy.getPassiveAbility().name} Nature: ${Nature[enemy.nature]} Gender: ${Gender[enemy.gender]} Rarity: ${LoggerTools.rarities[e]} AbilityIndex: ${enemy.abilityIndex} ID: ${enemy.id}`;
+        `Form: ${enemy.getSpeciesForm().getSpriteAtlasPath(false, enemy.formIndex)} Species ID: ${enemy.species.speciesId} Stats: ${enemy.stats} IVs: ${enemy.ivs} Ability: ${enemy.getAbility().name} ` +
+        `Passive Ability: ${enemy.getPassiveAbility().name} Nature: ${Nature[enemy.nature]} Gender: ${Gender[enemy.gender]} Rarity: ${LoggerTools.rarities[e]} AbilityIndex: ${enemy.abilityIndex} `+
+        `ID: ${enemy.id} Type: ${enemy.getTypes().map(t => Type[t]).join(",")} Moves: ${enemy.getMoveset().map(m => Moves[m?.moveId ?? 0]).join(",")}`;
         this.encounterList.push(text);
         console.log(text);
         if (battle.waveIndex == 50) {
-          console.log(enemy.moveset.map(m => Moves[m?.moveId ?? 0]))
+          // separate print so its easier to find for discord pin
+          console.log(enemy.getMoveset().map(m => Moves[m?.moveId ?? 0]))
         }
       }
     })
