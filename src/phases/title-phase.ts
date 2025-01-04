@@ -809,7 +809,7 @@ export class TitlePhase extends Phase {
   }
 
   GenerateBattle(nolog: boolean = false) {
-    console.log(`%%%%%  Wave: ${this.scene.currentBattle.waveIndex}  %%%%%`)
+    console.log(`%%%%%  Wave: ${this.scene.currentBattle.waveIndex + 1}  %%%%%`)
     var battle = this.scene.newBattle() as Battle;
     while (LoggerTools.rarities.length > 0) {
       LoggerTools.rarities.pop();
