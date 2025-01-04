@@ -115,12 +115,12 @@ export class Arena {
       "Super Rare",
       "Ultra Rare",
     ];
-    LoggerTools.rarities[LoggerTools.rarityslot[0]] = tiernames[tier];
     console.log(tiernames[tier]);
     while (!this.pokemonPool[tier].length) {
       console.log(`Downgraded rarity tier from ${BiomePoolTier[tier]} to ${BiomePoolTier[tier - 1]}`);
       tier--;
     }
+    LoggerTools.rarities[LoggerTools.rarityslot[0]] = tiernames[tier];
     const tierPool = this.pokemonPool[tier];
     let ret: PokemonSpecies;
     let regen = false;
@@ -168,7 +168,7 @@ export class Arena {
     }
 
     if (regen && (attempt || 0) < 10) {
-      console.log(waveIndex, this.biomeType, ret.name, level, "Incompatible level: regenerating...");
+      console.log(waveIndex, Biome[this.biomeType], ret.name, level, "Incompatible level: regenerating...");
       return this.randomSpecies(waveIndex, level, (attempt || 0) + 1);
     }
 
