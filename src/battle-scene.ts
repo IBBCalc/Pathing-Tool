@@ -148,6 +148,7 @@ export default class BattleScene extends SceneBase {
   public damageNumbersMode: integer = 0;
   public reroll: boolean = false;
   public shopCursorTarget: number = ShopCursorTarget.REWARDS;
+  public commandCursorMemory: boolean = false;
   public showMovesetFlyout: boolean = true;
   public showTeams: boolean = true;
   public showTeamSprites: boolean = false;
@@ -188,7 +189,7 @@ export default class BattleScene extends SceneBase {
   public uiTheme: UiTheme = UiTheme.DEFAULT;
   public windowType: integer = 0;
   public experimentalSprites: boolean = false;
-  public musicPreference: number = MusicPreference.MIXED;
+  public musicPreference: number = MusicPreference.ALLGENS;
   public moveAnimations: boolean = true;
   public expGainsSpeed: ExpGainsSpeed = ExpGainsSpeed.DEFAULT;
   public skipSeenDialogues: boolean = false;
