@@ -1,9 +1,6 @@
 import i18next from "i18next";
 import BattleScene from "../battle-scene";
 import { Button } from "#enums/buttons";
-import { GameMode } from "../game-mode";
-import { PokemonHeldItemModifier } from "../modifier/modifier";
-import { SessionSaveData } from "../system/game-data";
 import PokemonData from "../system/pokemon-data";
 import * as Utils from "../utils";
 import MessageUiHandler from "./message-ui-handler";
@@ -11,11 +8,8 @@ import { TextStyle, addTextObject } from "./text";
 import { Mode } from "./ui";
 import { addWindow } from "./ui-theme";
 import * as LoggerTools from "../logger"
-import { loggedInUser } from "#app/account.js";
-import { allpanels, biomePanelIDs } from "../loading-scene"
-import { getBiomeName } from "#app/data/biomes.js";
 import { Species } from "#app/enums/species.js";
-import { allSpecies, getPokemonSpecies, getPokemonSpeciesForm } from "#app/data/pokemon-species.js";
+import { allSpecies, getPokemonSpecies } from "#app/data/pokemon-species.js";
 
 const sessionSlotCount = 5;
 const gap = 20;
@@ -89,7 +83,7 @@ export default class LogSelectUiHandler extends MessageUiHandler {
 
     this.selectCallback = args[0] as LogSelectCallback;
     this.quitCallback = args[1] as LogSelectCallback;
-    
+
     console.log(this.selectCallback)
 
     this.saveSlotSelectContainer.setVisible(true);
@@ -299,7 +293,7 @@ class SessionSlot extends Phaser.GameObjects.Container {
 
     const playTimeLabel = addTextObject(this.scene, 8, 33, data.version + " / Path: " + (data.label || ""), TextStyle.WINDOW);
     this.add(playTimeLabel);
-    
+
     var wavecount = 0
     data.waves.forEach((wv, idx) => {
       if (wv) {
