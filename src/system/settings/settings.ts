@@ -863,6 +863,20 @@ export function setSetting(scene: BattleScene, setting: string, value: integer):
     case SettingKeys.Enable_Retries:
       scene.enableRetries = Setting[index].options[value].value === "On";
       break;
+    case SettingKeys.Damage_Display:
+      scene.damageDisplay = Setting[index].options[value].value
+    case SettingKeys.LazyReloads:
+      scene.lazyReloads = Setting[index].options[value].value == "On"
+    case SettingKeys.FancyBiome:
+      scene.menuChangesBiome = Setting[index].options[value].value == "On"
+    case SettingKeys.ShowAutosaves:
+      scene.showAutosaves = Setting[index].options[value].value == "On"
+    case SettingKeys.BiomePanels:
+      scene.doBiomePanels = Setting[index].options[value].value == "On"
+    case SettingKeys.DailyShinyLuck:
+      scene.disableDailyShinies = Setting[index].options[value].value == "Off"
+    case SettingKeys.TitleScreenContinueMode:
+      scene.quickloadDisplayMode  = Setting[index].options[value].value;
     case SettingKeys.Hide_IVs:
       scene.hideIvs = Setting[index].options[value].value === "On";
       break;
@@ -909,6 +923,10 @@ export function setSetting(scene: BattleScene, setting: string, value: integer):
       break;
     case SettingKeys.Show_Moveset_Flyout:
       scene.showMovesetFlyout = Setting[index].options[value].value === "On";
+      break;
+    case SettingKeys.Show_Pokemon_Teams:
+      scene.showTeams = Setting[index].options[value].value !== "Off";
+      scene.showTeamSprites = Setting[index].options[value].value === "Sprite";
       break;
     case SettingKeys.Show_Arena_Flyout:
       scene.showArenaFlyout = Setting[index].options[value].value === "On";
@@ -963,81 +981,81 @@ export function setSetting(scene: BattleScene, setting: string, value: integer):
     case SettingKeys.Type_Hints:
       scene.typeHints = Setting[index].options[value].value === "On";
       break;
-    case SettingKeys.Language:
-      if (value) {
-        if (scene.ui) {
-          const cancelHandler = () => {
-            scene.ui.revertMode();
+      case SettingKeys.Language:
+        if (value) {
+          if (scene.ui) {
+            const cancelHandler = () => {
+              scene.ui.revertMode();
             (scene.ui.getHandler() as SettingsUiHandler).setOptionCursor(-1, 0, true);
-          };
-          const changeLocaleHandler = (locale: string): boolean => {
-            try {
-              i18next.changeLanguage(locale);
-              localStorage.setItem("prLang", locale);
-              cancelHandler();
-              // Reload the whole game to apply the new locale since also some constants are translated
-              window.location.reload();
-              return true;
-            } catch (error) {
-              console.error("Error changing locale:", error);
-              return false;
-            }
-          };
-          scene.ui.setOverlayMode(Mode.OPTION_SELECT, {
-            options: [
-              {
-                label: "English",
-                handler: () => changeLocaleHandler("en")
-              },
-              {
+            };
+            const changeLocaleHandler = (locale: string): boolean => {
+              try {
+                i18next.changeLanguage(locale);
+                localStorage.setItem("prLang", locale);
+                cancelHandler();
+                // Reload the whole game to apply the new locale since also some constants are translated
+                window.location.reload();
+                return true;
+              } catch (error) {
+                console.error("Error changing locale:", error);
+                return false;
+              }
+            };
+            scene.ui.setOverlayMode(Mode.OPTION_SELECT, {
+              options: [
+                {
+                  label: "English",
+                  handler: () => changeLocaleHandler("en")
+                },
+                {
                 label: "Español (ES)",
                 handler: () => changeLocaleHandler("es-ES")
-              },
-              {
-                label: "Italiano",
-                handler: () => changeLocaleHandler("it")
-              },
-              {
-                label: "Français",
-                handler: () => changeLocaleHandler("fr")
-              },
-              {
-                label: "Deutsch",
-                handler: () => changeLocaleHandler("de")
-              },
-              {
-                label: "Português (BR)",
-                handler: () => changeLocaleHandler("pt-BR")
-              },
-              {
-                label: "简体中文",
-                handler: () => changeLocaleHandler("zh-CN")
-              },
-              {
-                label: "繁體中文",
-                handler: () => changeLocaleHandler("zh-TW")
-              },
-              {
-                label: "한국어",
-                handler: () => changeLocaleHandler("ko")
-              },
-              {
-                label: "日本語",
-                handler: () => changeLocaleHandler("ja")
-              },
-              // {
-              //   label: "Català",
-              //   handler: () => changeLocaleHandler("ca-ES")
-              // },
-              {
-                label: i18next.t("settings:back"),
-                handler: () => cancelHandler()
-              }
-            ],
-            maxOptions: 7
-          });
-          return false;
-        }
+                },
+                {
+                  label: "Italiano",
+                  handler: () => changeLocaleHandler("it")
+                },
+                {
+                  label: "Français",
+                  handler: () => changeLocaleHandler("fr")
+                },
+                {
+                  label: "Deutsch",
+                  handler: () => changeLocaleHandler("de")
+                },
+                {
+                  label: "Português (BR)",
+                  handler: () => changeLocaleHandler("pt-BR")
+                },
+                {
+                  label: "简体中文",
+                  handler: () => changeLocaleHandler("zh-CN")
+                },
+                {
+                  label: "繁體中文",
+                  handler: () => changeLocaleHandler("zh-TW")
+                },
+                {
+                  label: "한국어",
+                  handler: () => changeLocaleHandler("ko")
+                },
+                {
+                  label: "日本語",
+                  handler: () => changeLocaleHandler("ja")
+                },
+                // {
+                //   label: "Català",
+                //   handler: () => changeLocaleHandler("ca-ES")
+                // },
+                {
+                  label: i18next.t("settings:back"),
+                  handler: () => cancelHandler()
+                }
+              ],
+              maxOptions: 7
+            });
+            return false;
+          }
       }
       break;
     case SettingKeys.Shop_Overlay_Opacity:
