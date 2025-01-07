@@ -97,15 +97,6 @@ export class SelectModifierPhase extends BattlePhase {
       this.updateSeed();
     } else if (this.rerollCount) {
       this.scene.reroll = false;
-    } else {
-      console.log("\n\nReroll Prediction\n\n\n");
-      this.updateSeed();
-      this.predictionCost = 0;
-      this.costTiers = [];
-      for (let idx = 0; idx < 10 && this.predictionCost < this.scene.money; idx++) {
-        this.generateSelection(idx, undefined);
-      }
-      this.updateSeed();
     }
 
     const party = this.scene.getPlayerParty();
