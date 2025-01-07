@@ -86,14 +86,25 @@ export class SelectModifierPhase extends BattlePhase {
     super.start();
     console.log(this.rerollCount)
 
-    if (!this.rerollCount && !this.isCopy) {
-      console.log("\n\nReroll Prediction\n\n\n");
-      this.updateSeed();
-      this.predictionCost = 0;
-      this.costTiers = [];
-      for (let idx = 0; idx < 10 && this.predictionCost < this.scene.money; idx++) {
-        this.generateSelection(idx, undefined);
+    this.scene.executeWithSeedOffset(() => {
+      if (!this.rerollCount) {
+        // Don't want any custom modifiers, we want to see the entire shop
+        var customMods = this.customModifierSettings;
+        this.customModifierSettings = undefined;
+
+        console.log("\n\nReroll Prediction\n\n\n");
+        this.predictionCost = 0;
+        this.costTiers = [];
+        for (let idx = 0; idx < 10 && this.predictionCost < this.scene.money; idx++) {
+          this.generateSelection(idx, undefined);
+        }
+
+        // Set them back for the real shop generation.
+        this.customModifierSettings = customMods;
       }
+    }, this.scene.currentBattle.waveIndex)
+
+    if (!this.rerollCount && !this.isCopy) {
       this.updateSeed();
     } else if (this.rerollCount) {
       this.scene.reroll = false;
