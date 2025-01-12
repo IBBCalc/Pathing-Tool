@@ -1186,7 +1186,9 @@ class SpeciesStatBoosterModifierTypeGenerator extends ModifierTypeGenerator {
         return new SpeciesStatBoosterModifierType(pregenArgs[0] as SpeciesStatBoosterItem);
       }
 
-      console.log("Generating item: Species Booster");
+      if (doModifierLogging) {
+        console.log("Generating item: Species Booster");
+      }
 
       const values = Object.values(items);
       const keys = Object.keys(items);
@@ -1297,6 +1299,8 @@ class EvolutionItemModifierTypeGenerator extends ModifierTypeGenerator {
           return evolutions.filter(e => e.item !== EvolutionItem.NONE && (e.evoFormKey === null || (e.preFormKey || "") === p.getFusionFormKey()) && (!e.condition || e.condition.predicate(p)));
         }).flat()
       ].flat().flatMap(e => e.item).filter(i => (!!i && i > 50) === rare);
+
+      // console.log("Evolution item pool:", evolutionItemPool)
 
       if (!evolutionItemPool.length) {
         return null;
@@ -2253,7 +2257,7 @@ const tierWeights = [ 768 / 1024, 195 / 1024, 48 / 1024, 12 / 1024, 1 / 1024 ];
 export const itemPoolChecks: Map<ModifierTypeKeys, boolean | undefined> = new Map();
 
 export function regenerateModifierPoolThresholds(party: Pokemon[], poolType: ModifierPoolType, rerollCount: integer = 0) {
-  console.log("Regenerating item pool");
+  //console.log("Regenerating item pool");
   const pool = getModifierPoolForType(poolType);
   itemPoolChecks.forEach((v, k) => {
     itemPoolChecks.set(k, false);
@@ -2269,7 +2273,7 @@ export function regenerateModifierPoolThresholds(party: Pokemon[], poolType: Mod
     const tierModifierIds: string[] = [];
     let tierMaxWeight = 0;
     let i = 0;
-    console.log("Summing pool weights");
+    //console.log("Summing pool weights");
     pool[t].reduce((total: integer, modifierType: WeightedModifierType) => {
       //console.warn(`  ${modifierType.modifierType.name} (Running total: ${total})`)
       const weightedModifierType = modifierType as WeightedModifierType;
@@ -2314,6 +2318,7 @@ export function regenerateModifierPoolThresholds(party: Pokemon[], poolType: Mod
         }
         tierMaxWeight += outputWeight;
       }
+      // console.log(modifierType.modifierType.id, weight)
       if (weight) {
         total += weight;
         //console.warn("Added " + weightedModifierType.modifierType.id)
@@ -2341,6 +2346,7 @@ export function regenerateModifierPoolThresholds(party: Pokemon[], poolType: Mod
   if (outputModifierData) {
     console.table(modifierTableData);
   }
+  // console.log("Total Modifier Weights:", thresholds)
   switch (poolType) {
     case ModifierPoolType.PLAYER:
       modifierPoolThresholds = thresholds;

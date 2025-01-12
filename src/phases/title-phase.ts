@@ -5,8 +5,8 @@ import { fetchDailyRunSeed, getDailyRunStarters } from "#app/data/daily-run";
 import { Gender } from "#app/data/gender";
 import { getBiomeKey } from "#app/field/arena";
 import { GameMode, GameModes, getGameMode } from "#app/game-mode";
-import { Modifier } from "#app/modifier/modifier";
-import { getDailyRunStarterModifiers, ModifierPoolType, modifierTypes, regenerateModifierPoolThresholds } from "#app/modifier/modifier-type";
+import { HiddenAbilityRateBoosterModifier, Modifier } from "#app/modifier/modifier";
+import { getDailyRunStarterModifiers, getModifierPoolForType, getPlayerModifierTypeOptions, ModifierPoolType, ModifierType, ModifierTypeOption, modifierTypes, regenerateModifierPoolThresholds } from "#app/modifier/modifier-type";
 import { Phase } from "#app/phase";
 import { SessionSaveData } from "#app/system/game-data";
 import { Unlockables } from "#app/system/unlockables";
@@ -32,7 +32,11 @@ import { applyAbAttrs, SyncEncounterNatureAbAttr } from "#app/data/ability.js";
 import { TrainerSlot } from "#app/data/trainer-config.js";
 import { BattleSpec } from "#app/enums/battle-spec.js";
 import { Moves } from "#app/enums/moves.js";
+import { ModifierTier } from "#app/modifier/modifier-tier.js";
 import { Type } from "#app/enums/type.js";
+import { allSpecies } from "#app/data/pokemon-species.js";
+import { PlayerPokemon } from "#app/field/pokemon.js";
+import { BattlerTagLapseType } from "#app/data/battler-tags.js";
 
 
 export class TitlePhase extends Phase {
@@ -486,7 +490,39 @@ export class TitlePhase extends Phase {
             return true;
           }
         });
-        this.scene.ui.setOverlayMode(Mode.OPTION_SELECT, { options: charmOptions });
+        this.scene.ui.showText("Encounter Scouting", null, () => this.scene.ui.setOverlayMode(Mode.OPTION_SELECT, { options: charmOptions }));
+        return true;
+      }
+    }, {
+      label: "Shop Scouting",
+      handler: () => {
+        const shopOptions: OptionSelectItem[] = [];
+        shopOptions.push({
+          label: "Shop no evo",
+          handler: () => {
+            this.InitShopScouting(0);
+            return true;
+          }
+        }, {
+          label: "Shop lvl evo",
+          handler: () => {
+            this.InitShopScouting(1);
+            return true;
+          }
+        }, {
+          label: "Shop 1x item evo",
+          handler: () => {
+            this.InitShopScouting(2);
+            return true;
+          }
+        }, {
+          label: "Shop 2x item evo",
+          handler: () => {
+            this.InitShopScouting(3);
+            return true;
+          }
+        });
+        this.scene.ui.showText("Shop Scouting", null, () => this.scene.ui.setOverlayMode(Mode.OPTION_SELECT, { options: shopOptions }));
         return true;
       }
     }, {
@@ -728,6 +764,241 @@ export class TitlePhase extends Phase {
     }
 
     super.end();
+  }
+
+  InitShopScouting(method) {
+    this.scene.sessionSlotId = 0;
+    this.scene.gameData.loadSession(this.scene, this.scene.sessionSlotId, undefined, undefined).then((success: boolean) => {
+      this.ShopScouting(method);
+    }).catch(err => {
+      console.error(err);
+      this.scene.ui.showText(`something went wrong, see console error`, null);
+    });
+  }
+
+  private iterations: string[] = [];
+  private charmList: string[] = [];
+  ShopScouting(method) {
+    // this.scene.currentBattle.waveIndex = 31;
+
+    // Remove any lures or charms
+    this.scene.RemoveModifiers();
+    console.log(`Starting shop scouting ${new Date().toLocaleString()}`);
+
+    var party = this.scene.getPlayerParty();
+
+    var comps = [
+      [Species.MEW, Species.MEW, Species.MEW, Species.MEW, Species.MEW, Species.MEW],
+      [Species.MEW, Species.MEW, Species.MEW, Species.MEW, Species.MEW, Species.BULBASAUR],
+      [Species.MEW, Species.MEW, Species.MEW, Species.MEW, Species.MEW, Species.JIGGLYPUFF],
+      [Species.MEW, Species.MEW, Species.MEW, Species.MEW, Species.MEW, Species.POLIWHIRL],
+      // [Species.MEW, Species.MEW, Species.MEW, Species.MEW, Species.SWELLOW, Species.MEW],
+      // [Species.MEW, Species.MEW, Species.MEW, Species.MEW, Species.SWELLOW, Species.BULBASAUR],
+      // [Species.MEW, Species.MEW, Species.MEW, Species.MEW, Species.SWELLOW, Species.JIGGLYPUFF],
+      // [Species.MEW, Species.MEW, Species.MEW, Species.MEW, Species.SWELLOW, Species.POLIWHIRL],
+    ]
+
+    var ethers = [
+      (pokemon) => true,
+      (pokemon) => pokemon.moveset[0]?.usePp(pokemon.moveset[0].getMovePp()),
+      (pokemon) => pokemon.moveset[1]?.usePp(pokemon.moveset[1].getMovePp()),
+      (pokemon) => pokemon.moveset[2]?.usePp(pokemon.moveset[2].getMovePp()),
+    ]
+
+    var lures = [
+      () => "",
+      () => {
+        this.scene.RemoveModifiers();
+        this.scene.InsertLure();
+        return "Lure";
+      },
+      () => {
+        this.scene.RemoveModifiers();
+        this.scene.InsertSuperLure();
+        return "Super Lure";
+      },
+      () => {
+        this.scene.RemoveModifiers();
+        this.scene.InsertMaxLure();
+        return "Max Lure";
+      },
+      () => {
+        this.scene.RemoveModifiers();
+        this.scene.InsertLure();
+        this.scene.InsertSuperLure();
+        return "Lure + Super Lure";
+      },
+      () => {
+        this.scene.RemoveModifiers();
+        this.scene.InsertSuperLure();
+        this.scene.InsertMaxLure();
+        return "Super Lure + Max Lure";
+      },
+      () => {
+        this.scene.RemoveModifiers();
+        this.scene.InsertThreeLures();
+        return "All Lures";
+      },
+    ]
+
+    // var globals = [
+    //   () => this.scene.InsertMegaBracelet(),
+    //   () => this.scene.InsertDynamaxBand(),
+    //   () => this.scene.InsertTeraOrb(),
+    //   () => this.scene.InsertLockCapsule(),
+    // ]
+
+    // globals.forEach(g => {
+    //   this.scene.RemoveModifiers();
+    //   g()
+
+    // comps.forEach(c => {
+    this.iterations = [];
+    var comp = comps[method];
+
+    this.ClearParty(party);
+    this.FillParty(party, comp);
+
+    var partynames = party.map(p => p.name);
+    console.log(partynames, party);
+
+    var e = 0;
+    ethers.forEach(ether => {
+      ether(party[0])
+
+      lures.forEach(lure => {
+        var text = lure();
+        this.IteratePotions(party, 0, 0, 0, 0, 0, e, text);
+      });
+
+      e++;
+    })
+    // });
+    // });
+
+    console.log(this.charmList);
+    this.scene.ui.showText("DONE! Copy the list from the console and refresh the page.", null);
+  }
+
+  ClearParty(party: PlayerPokemon[]) {
+    do {
+      this.scene.removePokemonFromPlayerParty(party[0], true);
+    }
+    while (party.length > 0);
+  }
+
+  FillParty(party: PlayerPokemon[], comp: Species[]) {
+    comp.forEach((s: Species) => {
+      this.AddPokemon(party, s);
+    });
+  }
+
+  AddPokemon(party: PlayerPokemon[], species: Species) {
+    var pokemon = allSpecies.filter(sp => sp.speciesId == species)[0];
+    party.push(this.scene.addPlayerPokemon(pokemon, 70));
+  }
+
+  CreateLog(a = 0, b = 0, c = 0, d = 0, e = 0, f = "") {
+    var items: string[] = [];
+    if (a - b > 0) items.push(`${a - b}x 75%-87.5% HP`);
+    if (b - c > 0) items.push(`${b - c}x 62.5%-75% HP`);
+    if (c - d > 0) items.push(`${c - d}x 50%-62.5% and 100dmg taken`);
+    if (d > 0) items.push(`${d}x <50% and 150dmg taken`);
+    if (e > 0) items.push(`${e}x low PP`);
+    if (f != "") items.push(`${f}`);
+
+    if (items.length == 0) {
+      items.push("nothing");
+    }
+
+    return items.join(" + ");
+  }
+
+  // Done:
+  //  Potion
+  //  Super Potion
+  //  Hyper Potion
+  //  Max Potion
+  //  Ether
+  //  Max Ether
+  //  Elixir
+  //  Max Elixir
+  //  Lure
+  //  Super Lure
+  //  Max Lure
+  //
+  // Planned:
+  //  Revive
+  //  Max Revive
+  //  Full Heal
+  //  Full Restore
+  //  Sacred Ash
+  //  Form Change Items
+  //  Species Items
+  //  Leek
+  //  Toxic Orb
+  //  Flame Orb
+  //  Tera Orb
+  //  Lock Capsule
+  //  Dynamax Band
+  //  Mega Bracelet
+  IteratePotions(party: PlayerPokemon[], n = 0, a = 0, b = 0, c = 0, d = 0, e = 0, f = "") {
+    if (n == 3) {
+      var i = `${a} ${b} ${c} ${d} ${e} ${f}`;
+      if (this.iterations.some(it => it == i)) return;
+
+      this.iterations.push(i)
+      this.GenerateShop(party, this.CreateLog(a, b, c, d, e, f));
+      return;
+    }
+
+    var pokemon = party[n];
+    var mhp = pokemon.getMaxHp();
+
+    // Nothing
+    this.IteratePotions(party, n + 1, a, b, c, d, e, f);
+
+    // potion
+    pokemon.hp = mhp - Math.min(Math.max(Math.floor(mhp * 0.18), 10), mhp - 1);
+    this.IteratePotions(party, n + 1, a + 1, b, c, d, e, f);
+
+    // super potion
+    pokemon.hp = mhp - Math.min(Math.max(Math.floor(mhp * 0.31), 25), mhp - 1);
+    this.IteratePotions(party, n + 1, a + 1, b + 1, c, d, e, f);
+
+    // hyper potion
+    pokemon.hp = mhp - Math.min(Math.max(Math.floor(mhp * 0.499), 100), mhp - 1);
+    this.IteratePotions(party, n + 1, a + 1, b + 1, c + 1, d, e, f);
+
+    // max potion
+    pokemon.hp = mhp - Math.min(Math.max(Math.floor(mhp * 0.51), 150), mhp - 1);
+    this.IteratePotions(party, n + 1, a + 1, b + 1, c + 1, d + 1, e, f);
+
+    // reset pokemon
+    pokemon.hp = pokemon.getMaxHp();
+  }
+
+  GenerateShop(party: PlayerPokemon[], comptext: string) {
+    // var modifierPool = getModifierPoolForType(ModifierPoolType.PLAYER);
+    // modifierPool[ModifierTier.ULTRA].push(new WeightedModifierType(modifierTypes.EVIOLITE, 10))
+    // modifierPool[ModifierTier.GREAT].push(new WeightedModifierType(modifierTypes.EVOLUTION_ITEM, Math.min(Math.ceil(this.scene.currentBattle.waveIndex / 15), 8), 8))
+
+    for (var w = 1; w < 50; w++) {
+      if (w % 10 == 0) continue;
+
+      this.scene.executeWithSeedOffset(() => {
+        this.scene.currentBattle.waveIndex = w;
+        for (var i = 0; i < 5; i++) {
+          regenerateModifierPoolThresholds(party, ModifierPoolType.PLAYER, i);
+          // console.log(modifierPool)
+          const typeOptions: ModifierTypeOption[] = getPlayerModifierTypeOptions(Math.min(6, 3 + Math.floor((w / 10) - 1)), party);
+          if (typeOptions.some(t => t.type.id == "ABILITY_CHARM")) {
+            console.log(w, i, comptext);
+            this.charmList.push(`${w} ${i} ${comptext}`);
+          }
+        }
+      }, w);
+    }
   }
 
   InitScouting(charms: number) {

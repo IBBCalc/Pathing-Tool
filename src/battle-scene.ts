@@ -4,7 +4,7 @@ import Pokemon, { EnemyPokemon, PlayerPokemon } from "#app/field/pokemon";
 import PokemonSpecies, { allSpecies, getPokemonSpecies, PokemonSpeciesFilter } from "#app/data/pokemon-species";
 import { Constructor, isNullOrUndefined, randSeedInt } from "#app/utils";
 import * as Utils from "#app/utils";
-import { ConsumableModifier, ConsumablePokemonModifier, DoubleBattleChanceBoosterModifier, ExpBalanceModifier, ExpShareModifier, FusePokemonModifier, HealingBoosterModifier, HiddenAbilityRateBoosterModifier, Modifier, ModifierBar, ModifierPredicate, MoneyMultiplierModifier, MultipleParticipantExpBonusModifier, PersistentModifier, PokemonExpBoosterModifier, PokemonFormChangeItemModifier, PokemonHeldItemModifier, PokemonHpRestoreModifier, PokemonIncrementingStatModifier, RememberMoveModifier, TerastallizeModifier, TurnHeldItemTransferModifier } from "./modifier/modifier";
+import { ConsumableModifier, ConsumablePokemonModifier, DoubleBattleChanceBoosterModifier, ExpBalanceModifier, ExpShareModifier, ExtraModifierModifier, FusePokemonModifier, GigantamaxAccessModifier, HealingBoosterModifier, HiddenAbilityRateBoosterModifier, LockModifierTiersModifier, MegaEvolutionAccessModifier, Modifier, ModifierBar, ModifierPredicate, MoneyMultiplierModifier, MultipleParticipantExpBonusModifier, PersistentModifier, PokemonExpBoosterModifier, PokemonFormChangeItemModifier, PokemonHeldItemModifier, PokemonHpRestoreModifier, PokemonIncrementingStatModifier, RememberMoveModifier, TerastallizeAccessModifier, TerastallizeModifier, TurnHeldItemTransferModifier } from "./modifier/modifier";
 import { PokeballType } from "#enums/pokeball";
 import { initCommonAnims, initMoveAnim, loadCommonAnimAssets, loadMoveAnimAssets, populateAnims } from "#app/data/battle-anims";
 import { Phase } from "#app/phase";
@@ -1300,8 +1300,35 @@ export default class BattleScene extends SceneBase {
     this.addModifier(ability_charm, true, false, false, true);
   }
 
+  InsertMegaBracelet() {
+    let modifier = modifierTypes.MEGA_BRACELET().withIdFromFunc(modifierTypes.MEGA_BRACELET).newModifier() as MegaEvolutionAccessModifier
+    this.addModifier(modifier , true, false, false, true);
+  }
+
+  InsertDynamaxBand() {
+    let modifier = modifierTypes.DYNAMAX_BAND().withIdFromFunc(modifierTypes.DYNAMAX_BAND).newModifier() as GigantamaxAccessModifier
+    this.addModifier(modifier , true, false, false, true);
+  }
+
+  InsertTeraOrb() {
+    let modifier = modifierTypes.TERA_ORB().withIdFromFunc(modifierTypes.TERA_ORB).newModifier() as TerastallizeAccessModifier
+    this.addModifier(modifier , true, false, false, true);
+  }
+
+  InsertLockCapsule() {
+    let modifier = modifierTypes.LOCK_CAPSULE().withIdFromFunc(modifierTypes.LOCK_CAPSULE).newModifier() as LockModifierTiersModifier
+    this.addModifier(modifier , true, false, false, true);
+  }
+
   RemoveModifiers() {
-    var mods = this.modifiers.filter(m => m instanceof HiddenAbilityRateBoosterModifier || m instanceof DoubleBattleChanceBoosterModifier);
+    var mods = this.modifiers.filter(m =>
+      m instanceof HiddenAbilityRateBoosterModifier
+      || m instanceof DoubleBattleChanceBoosterModifier
+      || m instanceof ExtraModifierModifier
+      || m instanceof MegaEvolutionAccessModifier
+      || m instanceof GigantamaxAccessModifier
+      || m instanceof TerastallizeAccessModifier
+      || m instanceof LockModifierTiersModifier);
     mods.forEach(m => {
       this.removeModifier(m);
     })

@@ -143,7 +143,7 @@ export function randItem<T>(items: T[], reason?: string): T {
 export function randSeedItem<T>(items: T[], reason?: string): T {
   function rpick() {
     let V = Phaser.Math.RND.pick(items)
-    console.log(reason ? reason : "randSeedItem")
+    if (doRNGLogging) console.log(reason ? reason : "randSeedItem")
     return V;
   }
   return items.length === 1
