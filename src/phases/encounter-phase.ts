@@ -332,7 +332,7 @@ export class EncounterPhase extends BattlePhase {
       LoggerTools.flagResetIfExists(this.scene);
     }
     LoggerTools.logTeam(this.scene, this.scene.currentBattle.waveIndex);
-    if (this.scene.getEnemyParty()[0].hasTrainer()) {
+    if (this.scene.getEnemyParty()[0]?.hasTrainer()) {
       LoggerTools.logTrainer(this.scene, this.scene.currentBattle.waveIndex);
     }
     if (this.scene.currentBattle.waveIndex == 1) {

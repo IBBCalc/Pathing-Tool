@@ -1208,7 +1208,7 @@ function printPoke(inData: string, indent: string, pokemon: PokeData) {
 export function logTeam(scene: BattleScene, floor: integer = scene.currentBattle.waveIndex) {
   var team = scene.getEnemyParty()
   console.log("Log Enemy Team")
-  if (team[0].hasTrainer()) {
+  if (team[0]?.hasTrainer()) {
     //var sprite = scene.currentBattle.trainer.config.getSpriteKey()
     //var trainerCat = Utils.getEnumKeys(TrainerType)[Utils.getEnumValues(TrainerType).indexOf(scene.currentBattle.trainer.config.trainerType)]
     //setRow("e", floor + ",0," + sprite + ",trainer," + trainerCat + ",,,,,,,,,,,,", floor, 0)
