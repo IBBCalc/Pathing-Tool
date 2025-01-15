@@ -37,6 +37,7 @@ import { Type } from "#app/enums/type.js";
 import { allSpecies } from "#app/data/pokemon-species.js";
 import { PlayerPokemon } from "#app/field/pokemon.js";
 import { BattlerTagLapseType } from "#app/data/battler-tags.js";
+import overrides from "#app/overrides.js";
 
 
 export class TitlePhase extends Phase {
@@ -841,6 +842,34 @@ export class TitlePhase extends Phase {
       },
     ]
 
+    var comp = comps[method];
+    var mushroom = [
+      (mu: {start: integer, end: integer, level: integer}) => {
+        this.ClearParty(party);
+        overrides.MOVESET_OVERRIDE = [Moves.TACKLE, Moves.SPLASH, Moves.SPLASH, Moves.SPLASH];
+        mu.level = 39;
+        this.FillParty(party, comp, mu.level);
+        mu.start = 1;
+        mu.end  = 20;
+      },
+      (mu: {start: integer, end: integer, level: integer}) => {
+        this.ClearParty(party);
+        overrides.MOVESET_OVERRIDE = [Moves.TACKLE, Moves.SPLASH, Moves.SPLASH, Moves.SPLASH];
+        mu.level = 59;
+        this.FillParty(party, comp, mu.level);
+        mu.start = 15;
+        mu.end  = 40;
+      },
+      (mu: {start: integer, end: integer, level: integer}) => {
+        this.ClearParty(party);
+        overrides.MOVESET_OVERRIDE = [Moves.TACKLE, Moves.SPLASH, Moves.SPLASH, Moves.SPLASH];
+        mu.level = 79;
+        this.FillParty(party, comp, mu.level);
+        mu.start = 35;
+        mu.end  = 50;
+      }
+    ]
+
     // var globals = [
     //   () => this.scene.InsertMegaBracelet(),
     //   () => this.scene.InsertDynamaxBand(),
@@ -852,28 +881,31 @@ export class TitlePhase extends Phase {
     //   this.scene.RemoveModifiers();
     //   g()
 
-    // comps.forEach(c => {
     this.iterations = [];
-    var comp = comps[method];
 
-    this.ClearParty(party);
-    this.FillParty(party, comp);
+    mushroom.forEach(m => {
+      var mu = {
+        start: 0,
+        end: 0,
+        level: 0
+      }
+      m(mu);
 
-    var partynames = party.map(p => p.name);
-    console.log(partynames, party);
+      var partynames = party.map(p => p.name);
+      console.log(mu.level, partynames, party);
 
-    var e = 0;
-    ethers.forEach(ether => {
-      ether(party[0])
+      var e = 0;
+      ethers.forEach(ether => {
+        ether(party[0])
 
-      lures.forEach(lure => {
-        var text = lure();
-        this.IteratePotions(party, 0, 0, 0, 0, 0, e, text);
-      });
+        lures.forEach(lure => {
+          var text = lure();
+          this.IteratePotions(party, 0, 0, 0, 0, 0, e, text, mu.start, mu.end, mu.level);
+        });
 
-      e++;
+        e++;
+      })
     })
-    // });
     // });
 
     console.log(this.charmList);
@@ -887,31 +919,15 @@ export class TitlePhase extends Phase {
     while (party.length > 0);
   }
 
-  FillParty(party: PlayerPokemon[], comp: Species[]) {
+  FillParty(party: PlayerPokemon[], comp: Species[], level: integer) {
     comp.forEach((s: Species) => {
-      this.AddPokemon(party, s);
+      this.AddPokemon(party, s, level);
     });
   }
 
-  AddPokemon(party: PlayerPokemon[], species: Species) {
+  AddPokemon(party: PlayerPokemon[], species: Species, level: integer) {
     var pokemon = allSpecies.filter(sp => sp.speciesId == species)[0];
-    party.push(this.scene.addPlayerPokemon(pokemon, 70));
-  }
-
-  CreateLog(a = 0, b = 0, c = 0, d = 0, e = 0, f = "") {
-    var items: string[] = [];
-    if (a - b > 0) items.push(`${a - b}x 75%-87.5% HP`);
-    if (b - c > 0) items.push(`${b - c}x 62.5%-75% HP`);
-    if (c - d > 0) items.push(`${c - d}x 50%-62.5% and 100dmg taken`);
-    if (d > 0) items.push(`${d}x <50% and 150dmg taken`);
-    if (e > 0) items.push(`${e}x low PP`);
-    if (f != "") items.push(`${f}`);
-
-    if (items.length == 0) {
-      items.push("nothing");
-    }
-
-    return items.join(" + ");
+    party.push(this.scene.addPlayerPokemon(pokemon, level));
   }
 
   // Done:
@@ -926,6 +942,7 @@ export class TitlePhase extends Phase {
   //  Lure
   //  Super Lure
   //  Max Lure
+  //  Memory Mushroom
   //
   // Planned:
   //  Revive
@@ -942,13 +959,31 @@ export class TitlePhase extends Phase {
   //  Lock Capsule
   //  Dynamax Band
   //  Mega Bracelet
-  IteratePotions(party: PlayerPokemon[], n = 0, a = 0, b = 0, c = 0, d = 0, e = 0, f = "") {
-    if (n == 3) {
-      var i = `${a} ${b} ${c} ${d} ${e} ${f}`;
+  CreateLog(pot = 0, suppot = 0, hyppot = 0, maxpot = 0, eth = 0, lure = "", level = 79) {
+    var items: string[] = [];
+    if (pot - suppot > 0) items.push(`${pot - suppot}x <87.5% HP and 10+ dmg taken`);
+    if (suppot - hyppot > 0) items.push(`${suppot - hyppot}x <75% HP and 25+ dmg taken`);
+    if (hyppot - maxpot > 0) items.push(`${hyppot - maxpot}x <62.5% and 100+ dmg taken`);
+    if (maxpot > 0) items.push(`${maxpot}x <50% and 150dmg taken`);
+    if (eth > 0) items.push(`${eth}x low PP`);
+    if (lure != "") items.push(`${lure}`);
+
+    if (items.length == 0) {
+      items.push("nothing");
+    }
+
+    items.push(`Highest level: ${level}`);
+
+    return items.join(" + ");
+  }
+
+  IteratePotions(party: PlayerPokemon[], n = 0, pot = 0, suppot = 0, hyppot = 0, maxpot = 0, eth = 0, lure = "", start = 1, end = 50, level = 79) {
+    if (n == Math.min(3, party.length)) {
+      var i = `${pot} ${suppot} ${hyppot} ${maxpot} ${eth} ${lure} ${level}`;
       if (this.iterations.some(it => it == i)) return;
 
       this.iterations.push(i)
-      this.GenerateShop(party, this.CreateLog(a, b, c, d, e, f));
+      this.GenerateShop(party, this.CreateLog(pot, suppot, hyppot, maxpot, eth, lure, level), start, end);
       return;
     }
 
@@ -956,42 +991,49 @@ export class TitlePhase extends Phase {
     var mhp = pokemon.getMaxHp();
 
     // Nothing
-    this.IteratePotions(party, n + 1, a, b, c, d, e, f);
+    this.IteratePotions(party, n + 1, pot, suppot, hyppot, maxpot, eth, lure, start, end, level);
 
     // potion
-    pokemon.hp = mhp - Math.min(Math.max(Math.floor(mhp * 0.18), 10), mhp - 1);
-    this.IteratePotions(party, n + 1, a + 1, b, c, d, e, f);
+    var damage = Math.min(Math.max(Math.floor(mhp * 0.18), 10));
+    if (damage < mhp) {
+      pokemon.hp = mhp - damage;
+      this.IteratePotions(party, n + 1, pot + 1, suppot, hyppot, maxpot, eth, lure, start, end, level);
+    }
 
     // super potion
-    pokemon.hp = mhp - Math.min(Math.max(Math.floor(mhp * 0.31), 25), mhp - 1);
-    this.IteratePotions(party, n + 1, a + 1, b + 1, c, d, e, f);
+    var damage = Math.min(Math.max(Math.floor(mhp * 0.31), 25));
+    if (damage < mhp) {
+      pokemon.hp = mhp - damage;
+      this.IteratePotions(party, n + 1, pot + 1, suppot + 1, hyppot, maxpot, eth, lure, start, end, level);
+    }
 
     // hyper potion
-    pokemon.hp = mhp - Math.min(Math.max(Math.floor(mhp * 0.499), 100), mhp - 1);
-    this.IteratePotions(party, n + 1, a + 1, b + 1, c + 1, d, e, f);
+    var damage = Math.min(Math.max(Math.floor(mhp * 0.45), 100));
+    if (damage < mhp) {
+      pokemon.hp = mhp - damage;
+      this.IteratePotions(party, n + 1, pot + 1, suppot + 1, hyppot + 1, maxpot, eth, lure, start, end, level);
+    }
 
     // max potion
-    pokemon.hp = mhp - Math.min(Math.max(Math.floor(mhp * 0.51), 150), mhp - 1);
-    this.IteratePotions(party, n + 1, a + 1, b + 1, c + 1, d + 1, e, f);
+    var damage = Math.min(Math.max(Math.floor(mhp * 0.55), 150));
+    if (damage < mhp) {
+      pokemon.hp = mhp - damage;
+      this.IteratePotions(party, n + 1, pot + 1, suppot + 1, hyppot + 1, maxpot + 1, eth, lure, start, end, level);
+    }
 
     // reset pokemon
     pokemon.hp = pokemon.getMaxHp();
   }
 
-  GenerateShop(party: PlayerPokemon[], comptext: string) {
-    // var modifierPool = getModifierPoolForType(ModifierPoolType.PLAYER);
-    // modifierPool[ModifierTier.ULTRA].push(new WeightedModifierType(modifierTypes.EVIOLITE, 10))
-    // modifierPool[ModifierTier.GREAT].push(new WeightedModifierType(modifierTypes.EVOLUTION_ITEM, Math.min(Math.ceil(this.scene.currentBattle.waveIndex / 15), 8), 8))
-
-    for (var w = 1; w < 50; w++) {
+  GenerateShop(party: PlayerPokemon[], comptext: string, start: integer, end: integer) {
+    for (var w = start; w < end; w++) {
       if (w % 10 == 0) continue;
 
       this.scene.executeWithSeedOffset(() => {
         this.scene.currentBattle.waveIndex = w;
         for (var i = 0; i < 5; i++) {
           regenerateModifierPoolThresholds(party, ModifierPoolType.PLAYER, i);
-          // console.log(modifierPool)
-          const typeOptions: ModifierTypeOption[] = getPlayerModifierTypeOptions(Math.min(6, 3 + Math.floor((w / 10) - 1)), party);
+          const typeOptions: ModifierTypeOption[] = getPlayerModifierTypeOptions(Math.min(6, Math.max(3, 3 + Math.floor((w / 10) - 1))), party);
           if (typeOptions.some(t => t.type.id == "ABILITY_CHARM")) {
             console.log(w, i, comptext);
             this.charmList.push(`${w} ${i} ${comptext}`);
