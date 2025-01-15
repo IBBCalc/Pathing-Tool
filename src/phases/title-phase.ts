@@ -1108,16 +1108,21 @@ export class TitlePhase extends Phase {
 
       if (!nolog) {
         var enemy = battle.enemyParty[e]
+        var atlaspath = enemy.getSpeciesForm().getSpriteAtlasPath(false, enemy.formIndex);
         // Regional pokemon have the same name, instead get their atlas path.
         if (enemy.species.speciesId > 1025) {
           // Using nicknames here because i want the getPokemonNameWithAffix so i have Wild/Foe information
           // Nicknames are stored in base 64? so convert btoa here
-          enemy.nickname = btoa(Species[enemy.getSpeciesForm().getSpriteAtlasPath(false, enemy.formIndex)])
+          enemy.nickname = btoa(Species[atlaspath])
+        }
+
+        if (atlaspath == "668") {
+          atlaspath += `-${Gender[enemy.gender].toLowerCase()}`
         }
 
         // Store encounters in a list, basically CSV (uses regex in sheets), but readable as well
         var text = `Wave: ${this.scene.currentBattle.waveIndex} Biome: ${Biome[this.scene.arena.biomeType]} Pokemon: ${getPokemonNameWithAffix(enemy)} ` +
-        `Form: ${enemy.getSpeciesForm().getSpriteAtlasPath(false, enemy.formIndex)} Species ID: ${enemy.species.speciesId} Stats: ${enemy.stats} IVs: ${enemy.ivs} Ability: ${enemy.getAbility().name} ` +
+        `Form: ${atlaspath} Species ID: ${enemy.species.speciesId} Stats: ${enemy.stats} IVs: ${enemy.ivs} Ability: ${enemy.getAbility().name} ` +
         `Passive Ability: ${enemy.getPassiveAbility().name} Nature: ${Nature[enemy.nature]} Gender: ${Gender[enemy.gender]} Rarity: ${LoggerTools.rarities[e]} AbilityIndex: ${enemy.abilityIndex} `+
         `ID: ${enemy.id} Type: ${enemy.getTypes().map(t => Type[t]).join(",")} Moves: ${enemy.getMoveset().map(m => Moves[m?.moveId ?? 0]).join(",")}`;
         this.encounterList.push(text);
