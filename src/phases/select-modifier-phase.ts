@@ -140,7 +140,11 @@ export class SelectModifierPhase extends BattlePhase {
         var T = i == 0 ? "----- Base Shop " : `---- Reroll #${i} `
         console.log(T + this.indent(25 - T.length, "-") + " ₽" + this.costTiers[i])
         for (var j = 0; j < this.modifierPredictions[i].length; j++) {
-          console.log(" " + (this.modifierPredictions[i][j].type.tier >= ModifierTier.ROGUE ? "★" : " ") + " " + this.modifierPredictions[i][j].type.name + (this.modifierPredictions[i][j].netprice == this.costTiers[i] ? "" : " - ₽" + this.modifierPredictions[i][j].netprice))
+          var tierIcon = (this.modifierPredictions[i][j].type.tier >= ModifierTier.ROGUE ? "★" : " ");
+          var isNugget = this.modifierPredictions[i][j].netprice == this.costTiers[i];
+          var actualValue = this.costTiers[i] - this.modifierPredictions[i][j].netprice;
+          var netprofit = actualValue - this.costTiers[i];
+          console.log(` ${tierIcon} ${this.modifierPredictions[i][j].type.name} ${isNugget ? "" : `- ₽${netprofit} (${actualValue})`}`)
         }
       }
     }
