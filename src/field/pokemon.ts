@@ -5589,6 +5589,10 @@ export class PokemonMove {
     this.ppUsed = Math.min(this.ppUsed + count, this.getMovePp());
   }
 
+  setFullPp() {
+    this.ppUsed = 0;
+  }
+
   getMovePp(): integer {
     return this.maxPpOverride || (this.getMove().pp + this.ppUp * Utils.toDmgValue(this.getMove().pp / 5));
   }

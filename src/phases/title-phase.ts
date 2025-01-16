@@ -780,8 +780,6 @@ export class TitlePhase extends Phase {
   private iterations: string[] = [];
   private charmList: string[] = [];
   ShopScouting(method) {
-    // this.scene.currentBattle.waveIndex = 31;
-
     // Remove any lures or charms
     this.scene.RemoveModifiers();
     console.log(`Starting shop scouting ${new Date().toLocaleString()}`);
@@ -801,13 +799,25 @@ export class TitlePhase extends Phase {
 
     var ethers = [
       (pokemon) => true,
-      (pokemon) => pokemon.moveset[0]?.usePp(pokemon.moveset[0].getMovePp()),
-      (pokemon) => pokemon.moveset[1]?.usePp(pokemon.moveset[1].getMovePp()),
-      (pokemon) => pokemon.moveset[2]?.usePp(pokemon.moveset[2].getMovePp()),
+      (pokemon) => {
+        this.SetFullPP(pokemon);
+        pokemon.moveset[0]?.usePp(pokemon.moveset[0].getMovePp())
+      },
+      (pokemon) =>  {
+        this.SetFullPP(pokemon);
+        pokemon.moveset[1]?.usePp(pokemon.moveset[1].getMovePp())
+      },
+      (pokemon) =>  {
+        this.SetFullPP(pokemon);
+        pokemon.moveset[2]?.usePp(pokemon.moveset[2].getMovePp())
+      },
     ]
 
     var lures = [
-      () => "",
+      () => {
+        this.scene.RemoveModifiers();
+        return "";
+      },
       () => {
         this.scene.RemoveModifiers();
         this.scene.InsertLure();
@@ -867,7 +877,13 @@ export class TitlePhase extends Phase {
         this.FillParty(party, comp, mu.level);
         mu.start = 35;
         mu.end  = 50;
-      }
+      },
+      // (mu: {start: integer, end: integer, level: integer}) => {
+      //   // Uses party of the save file
+      //   mu.level = 59;
+      //   mu.start = 29;
+      //   mu.end  = 30;
+      // },
     ]
 
     // var globals = [
@@ -930,6 +946,12 @@ export class TitlePhase extends Phase {
     party.push(this.scene.addPlayerPokemon(pokemon, level));
   }
 
+  SetFullPP(pokemon: PlayerPokemon) {
+    pokemon.getMoveset().forEach(ms => {
+      ms?.setFullPp();
+    })
+  }
+
   // Done:
   //  Potion
   //  Super Potion
@@ -963,8 +985,8 @@ export class TitlePhase extends Phase {
     var items: string[] = [];
     if (pot - suppot > 0) items.push(`${pot - suppot}x <87.5% HP and 10+ dmg taken`);
     if (suppot - hyppot > 0) items.push(`${suppot - hyppot}x <75% HP and 25+ dmg taken`);
-    if (hyppot - maxpot > 0) items.push(`${hyppot - maxpot}x <62.5% and 100+ dmg taken`);
-    if (maxpot > 0) items.push(`${maxpot}x <50% and 150dmg taken`);
+    if (hyppot - maxpot > 0) items.push(`${hyppot - maxpot}x 50%-62.5% and 100+ dmg taken`);
+    if (maxpot > 0) items.push(`${maxpot}x <50% and 100+ dmg taken`);
     if (eth > 0) items.push(`${eth}x low PP`);
     if (lure != "") items.push(`${lure}`);
 
@@ -972,7 +994,7 @@ export class TitlePhase extends Phase {
       items.push("nothing");
     }
 
-    items.push(`Highest level: ${level}`);
+    items.push(`Highest lvl: ${level - 19}-${level}`);
 
     return items.join(" + ");
   }
@@ -1009,13 +1031,13 @@ export class TitlePhase extends Phase {
 
     // hyper potion
     var damage = Math.min(Math.max(Math.floor(mhp * 0.45), 100));
-    if (damage < mhp) {
+    if (damage < mhp && (mhp - damage) / mhp > 0.5) {
       pokemon.hp = mhp - damage;
       this.IteratePotions(party, n + 1, pot + 1, suppot + 1, hyppot + 1, maxpot, eth, lure, start, end, level);
     }
 
     // max potion
-    var damage = Math.min(Math.max(Math.floor(mhp * 0.55), 150));
+    var damage = Math.min(Math.max(Math.floor(mhp * 0.51), 100));
     if (damage < mhp) {
       pokemon.hp = mhp - damage;
       this.IteratePotions(party, n + 1, pot + 1, suppot + 1, hyppot + 1, maxpot + 1, eth, lure, start, end, level);
