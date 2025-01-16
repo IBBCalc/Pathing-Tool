@@ -200,6 +200,7 @@ const cfg_keyboard_qwerty = {
     [SettingKeyboard.Alt_Button_Cycle_Variant]: Button.V,
     [SettingKeyboard.Alt_Button_Speed_Up]: Button.SPEED_UP,
     [SettingKeyboard.Alt_Button_Slow_Down]: Button.SLOW_DOWN,
+    [SettingKeyboard.PATHING_TOOL_UI]: Button.PATHING_TOOL_UI,
   },
   default: {
     KEY_ARROW_UP: SettingKeyboard.Button_Up,
@@ -220,7 +221,7 @@ const cfg_keyboard_qwerty = {
     KEY_PLUS: -1,
     KEY_MINUS: -1,
     KEY_A: SettingKeyboard.Alt_Button_Left,
-    KEY_B: -1,
+    KEY_B: SettingKeyboard.PATHING_TOOL_UI,
     KEY_D: SettingKeyboard.Alt_Button_Right,
     KEY_H: -1,
     KEY_I: -1,

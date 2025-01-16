@@ -89,6 +89,7 @@ export class UiInputs {
       [Button.V]:               () => this.buttonCycleOption(Button.V),
       [Button.SPEED_UP]:        () => this.buttonSpeedChange(),
       [Button.SLOW_DOWN]:       () => this.buttonSpeedChange(false),
+      [Button.PATHING_TOOL_UI]: () => this.buttonHideCustomUI(Button.PATHING_TOOL_UI),
     };
     return actions;
   }
@@ -112,6 +113,7 @@ export class UiInputs {
       [Button.V]:               () => this.buttonInfo(false),
       [Button.SPEED_UP]:        () => undefined,
       [Button.SLOW_DOWN]:       () => undefined,
+      [Button.PATHING_TOOL_UI]: () => undefined,
     };
     return actions;
   }
@@ -222,4 +224,9 @@ export class UiInputs {
     }
   }
 
+  buttonHideCustomUI(button: Button): void {
+    this.scene.togglePathingToolUI();
+    console.log(`Toggle Pathing Tool UI ${this.scene.pathingToolUI ? "ON" : "OFF"}`)
+    this.scene.ui.processInput(button);
+  }
 }

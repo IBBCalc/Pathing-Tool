@@ -40,6 +40,7 @@ export enum SettingKeyboard {
     Alt_Button_Slow_Down = "ALT_BUTTON_SLOW_DOWN",
     Button_Submit = "BUTTON_SUBMIT",
     Alt_Button_Submit = "ALT_BUTTON_SUBMIT",
+    PATHING_TOOL_UI = "PATHING_TOOL_UI",
 }
 
 const pressAction = i18next.t("settings:pressToBind");
@@ -80,6 +81,7 @@ export const settingKeyboardOptions = {
   [SettingKeyboard.Button_Slow_Down]: [ `KEY ${Button.SLOW_DOWN.toString()}`, pressAction ],
   [SettingKeyboard.Alt_Button_Slow_Down]: [ `KEY ${Button.SLOW_DOWN.toString()}`, pressAction ],
   [SettingKeyboard.Alt_Button_Submit]: [ `KEY ${Button.SUBMIT.toString()}`, pressAction ],
+  [SettingKeyboard.PATHING_TOOL_UI]: [ `KEY ${Button.PATHING_TOOL_UI.toString()}`, pressAction ],
 };
 
 export const settingKeyboardDefaults = {
@@ -119,6 +121,7 @@ export const settingKeyboardDefaults = {
   [SettingKeyboard.Button_Slow_Down]: 0,
   [SettingKeyboard.Alt_Button_Slow_Down]: 0,
   [SettingKeyboard.Alt_Button_Submit]: 0,
+  [SettingKeyboard.PATHING_TOOL_UI]: 0,
 };
 
 export const settingKeyboardBlackList = [
@@ -168,6 +171,7 @@ export function setSettingKeyboard(scene: BattleScene, setting: SettingKeyboard,
     case SettingKeyboard.Alt_Button_Speed_Up:
     case SettingKeyboard.Alt_Button_Slow_Down:
     case SettingKeyboard.Alt_Button_Submit:
+    case SettingKeyboard.PATHING_TOOL_UI:
       if (value) {
         if (scene.ui) {
           const cancelHandler = (success: boolean = false) : boolean => {

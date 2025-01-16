@@ -236,6 +236,8 @@ export default class BattleScene extends SceneBase {
 
   public disableMenu: boolean = false;
 
+  public pathingToolUI: boolean = true;
+
   public gameData: GameData;
   public sessionSlotId: integer;
 
@@ -1805,8 +1807,18 @@ export default class BattleScene extends SceneBase {
   moveBelowOverlay<T extends Phaser.GameObjects.GameObject>(gameObject: T) {
     this.fieldUI.moveBelow<any>(gameObject, this.fieldOverlay);
   }
+
   processInfoButton(pressed: boolean): void {
     this.arenaFlyout.toggleFlyout(pressed);
+  }
+
+  togglePathingToolUI(): void {
+    this.pathingToolUI = !this.pathingToolUI;
+    if (this.pathingToolUI) {
+      this.updateCatchRate();
+    } else {
+      this.updateScoreText();
+    }
   }
 
   showFieldOverlay(duration: integer): Promise<void> {
@@ -1914,10 +1926,14 @@ export default class BattleScene extends SceneBase {
   }
 
   updateScoreText(): void {
-    //this.scoreText.setText(`Score: ${this.score.toString()}`);
-    //this.scoreText.setVisible(this.gameMode.isDaily);
+    if (!this.pathingToolUI) {
+      this.scoreText.setText(`Score: ${this.score.toString()}`);
+      this.scoreText.setVisible(this.gameMode.isDaily);
+    }
   }
+
   setScoreText(text: string): void {
+    if (!this.pathingToolUI) return;
     if (this.scoreText == undefined) {
       return;
     }

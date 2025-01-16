@@ -25,6 +25,7 @@ import { getPokemonNameWithAffix } from "#app/messages";
 import { CommandPhase } from "#app/phases/command-phase";
 import { SelectModifierPhase } from "#app/phases/select-modifier-phase";
 import * as LoggerTools from "../logger";
+import { GameObjects } from "phaser";
 
 const defaultMessage = i18next.t("partyUiHandler:choosePokemon");
 
@@ -379,6 +380,7 @@ export default class PartyUiHandler extends MessageUiHandler {
             partySlot.slotHpBar.setVisible(false);
             partySlot.slotHpOverlay.setVisible(false);
             partySlot.slotHpText.setVisible(false);
+            partySlot.slotHpPercentageText.setVisible(false);
             partySlot.slotDescriptionLabel.setText(ableToTransfer);
             partySlot.slotDescriptionLabel.setVisible(true);
           }
@@ -659,6 +661,10 @@ export default class PartyUiHandler extends MessageUiHandler {
           }
       }
     }
+
+    this.partySlots.forEach(ps => {
+      ps.slotHpPercentageText.setVisible(this.scene.pathingToolUI);
+    });
 
     if (success) {
       ui.playSelect();
@@ -1061,6 +1067,7 @@ export default class PartyUiHandler extends MessageUiHandler {
       this.partySlots[i].slotHpBar.setVisible(true);
       this.partySlots[i].slotHpOverlay.setVisible(true);
       this.partySlots[i].slotHpText.setVisible(true);
+      if (this.scene.pathingToolUI) this.partySlots[i].slotHpPercentageText.setVisible(true);
     }
   }
 
@@ -1183,6 +1190,7 @@ class PartySlot extends Phaser.GameObjects.Container {
   public slotHpBar: Phaser.GameObjects.Image;
   public slotHpOverlay: Phaser.GameObjects.Sprite;
   public slotHpText: Phaser.GameObjects.Text;
+  public slotHpPercentageText: Phaser.GameObjects.Text;
   public slotDescriptionLabel: Phaser.GameObjects.Text; // this is used to show text instead of the HP bar i.e. for showing "Able"/"Not Able" for TMs when you try to learn them
 
 
@@ -1333,22 +1341,30 @@ class PartySlot extends Phaser.GameObjects.Container {
     this.slotHpText.setOrigin(1, 0);
     this.slotHpText.setVisible(false);
 
+    var hpPercentage = (this.pokemon.hp / this.pokemon.getMaxHp()) * 100;
+    this.slotHpPercentageText = addTextObject(this.scene, 0, 0, `${hpPercentage.toFixed(2)}%`, TextStyle.PARTY);
+    this.slotHpPercentageText.setPositionRelative(this.slotHpBar, this.slotIndex >= battlerCount ? 57 : 35, this.slotHpBar.height - 2);
+    this.slotHpPercentageText.setOrigin(1, 0);
+    this.slotHpPercentageText.setVisible(false);
+
     this.slotDescriptionLabel = addTextObject(this.scene, 0, 0, "", TextStyle.MESSAGE);
     this.slotDescriptionLabel.setPositionRelative(slotBg, this.slotIndex >= battlerCount ? 94 : 32, this.slotIndex >= battlerCount ? 16 : 46);
     this.slotDescriptionLabel.setOrigin(0, 1);
     this.slotDescriptionLabel.setVisible(false);
 
-    slotInfoContainer.add([ this.slotHpBar, this.slotHpOverlay, this.slotHpText, this.slotDescriptionLabel ]);
+    slotInfoContainer.add([ this.slotHpBar, this.slotHpOverlay, this.slotHpText, this.slotDescriptionLabel, this.slotHpPercentageText ]);
 
     if (partyUiMode !== PartyUiMode.TM_MODIFIER) {
       this.slotDescriptionLabel.setVisible(false);
       this.slotHpBar.setVisible(true);
       this.slotHpOverlay.setVisible(true);
       this.slotHpText.setVisible(true);
+      if ((this.scene as BattleScene).pathingToolUI) this.slotHpPercentageText.setVisible(true);
     } else {
       this.slotHpBar.setVisible(false);
       this.slotHpOverlay.setVisible(false);
       this.slotHpText.setVisible(false);
+      this.slotHpPercentageText.setVisible(false);
       let slotTmText: string;
 
       if (this.pokemon.getMoveset().filter(m => m?.moveId === tmMoveId).length > 0) {
