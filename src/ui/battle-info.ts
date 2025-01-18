@@ -596,7 +596,7 @@ export default class BattleInfo extends Phaser.GameObjects.Container {
     } else {
       P = party
     }
-    console.log("Updating ball icons for party (Pokemon: " + P.length + ")", P)
+    // console.log("Updating ball icons for party (Pokemon: " + P.length + ")", P)
     var staticparty = (this.scene as BattleScene).getEnemyParty()
     var states = new Array(6)
     for (var i = 0; i < 6; i++) {
@@ -608,12 +608,12 @@ export default class BattleInfo extends Phaser.GameObjects.Container {
         states[i] = "ball"
         if (!P[i].hp) {
           states[i] = "faint"
-          console.log(P[i].name + " - fainted")
+          // console.log(P[i].name + " - fainted")
         } else if (P[i].status) {
           states[i] = (this.scene as BattleScene).showTeamSprites ? "ball" : "status"
-          console.log(P[i].name + " - ball (status condition)")
+          // console.log(P[i].name + " - ball (status condition)")
         } else {
-          console.log(P[i].name + " - ball")
+          // console.log(P[i].name + " - ball")
         }
         if (P[i].isOnField()) {
           //console.log(P[i].name + " is in battle; set it as seen")
@@ -622,7 +622,7 @@ export default class BattleInfo extends Phaser.GameObjects.Container {
         if (P[i].usedInBattle) total_visible++;
         //console.log(P[i].name, P[i].getIconAtlasKey(true))
       } else {
-        console.log("[undefined]: empty")
+        // console.log("[undefined]: empty")
       }
     }
     if (staticparty.length > 0) {

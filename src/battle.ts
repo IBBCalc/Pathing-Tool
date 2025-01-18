@@ -22,6 +22,8 @@ import { CustomModifierSettings } from "#app/modifier/modifier-type";
 import { ModifierTier } from "#app/modifier/modifier-tier";
 import { MysteryEncounterType } from "#enums/mystery-encounter-type";
 
+const doCatchLogging: boolean = false;
+
 export enum ClassicFixedBossWaves {
   // TODO: other fixed wave battles should be added here
   EVIL_BOSS_1 = 115,
@@ -414,7 +416,7 @@ export default class Battle {
       Phaser.Math.RND.state(this.battleSeedState);
     } else {
       Phaser.Math.RND.sow([ Utils.shiftCharCodes(this.battleSeed, this.turn << 6) ]);
-      console.log("Battle Seed:", this.battleSeed);
+      if (doCatchLogging) console.log("Battle Seed:", this.battleSeed);
     }
     for (var i = 0; i < offset; i++) {
       // Perform useless rolls to offset RNG counter
@@ -423,7 +425,7 @@ export default class Battle {
     for (var i = 0; i < count; i++) {
       out.push(Utils.randSeedInt(range, min, `[${i + 1}/${count}] ${reason}`));
     }
-    console.log("[SIMULATED] " + reason + " (x" + count + (offset ? " + offset " + offset : "") + ")", out);
+    if (doCatchLogging) console.log("[SIMULATED] " + reason + " (x" + count + (offset ? " + offset " + offset : "") + ")", out);
     Phaser.Math.RND.state(state);
     //scene.setScoreText("RNG: " + tempRngCounter + " (Last sim: " + this.rngCounter + ")")
     scene.rngCounter = tempRngCounter;
@@ -447,7 +449,7 @@ export default class Battle {
       Phaser.Math.RND.state(this.battleSeedState);
     } else {
       Phaser.Math.RND.sow([ Utils.shiftCharCodes(this.battleSeed, this.turn << 6) ]);
-      console.log("Battle Seed:", this.battleSeed);
+      if (doCatchLogging) console.log("Battle Seed:", this.battleSeed);
     }
     scene.rngCounter = this.rngCounter++;
     scene.rngSeedOverride = this.battleSeed;

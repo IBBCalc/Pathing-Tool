@@ -127,7 +127,7 @@ export default class BattleFlyout extends Phaser.GameObjects.Container {
   /** Sets and formats the text property for all {@linkcode Phaser.GameObjects.Text} in the flyoutText array */
   setText(highlight?: integer) {
     var e = this.battleScene.getEnemyField()
-    console.log(this.moveInfo.map(v => v.move.name))
+    // console.log(this.moveInfo.map(v => v.move.name))
     for (let i = 0; i < this.flyoutText.length; i++) {
       const flyoutText = this.flyoutText[i];
       const moveInfo = this.moveInfo[i];

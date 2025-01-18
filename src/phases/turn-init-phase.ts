@@ -121,7 +121,7 @@ export class TurnInitPhase extends FieldPhase {
     Pt.forEach((pokemon, i) => {
       if (pokemon != undefined && pokemon.hp > 0 && pokemon.isActive())
         if (pokemon.hasTrainer() || true) {
-          console.log(i)
+          // console.log(i)
           if (pokemon.getFieldIndex() == 1 && pokemon.isOnField()) {
             // Switch this to cycle between
             //   - hiding the top mon's team bar
