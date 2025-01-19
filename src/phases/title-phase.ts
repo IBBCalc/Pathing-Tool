@@ -1088,6 +1088,9 @@ export class TitlePhase extends Phase {
         `ID: ${p.id} Type: ${p.getTypes().map(t => Type[t]).join(",")} Moves: ${p.getMoveset().map(m => Moves[m?.moveId ?? 0]).join(",")}`);
     });
 
+    this.ClearParty(party);
+    this.FillParty(party, [Species.VENUSAUR], 20);
+
     var output: string[][] = [];
     output.push([`startstarters`]);
     output.push(starters);
