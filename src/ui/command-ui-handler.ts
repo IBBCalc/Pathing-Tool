@@ -105,7 +105,7 @@ export default class CommandUiHandler extends UiHandler {
             break;
           // Run
           case Command.RUN:
-            (this.scene.getCurrentPhase() as CommandPhase).handleCommand(Command.RUN, 0);
+            (this.scene.getCurrentPhase() as CommandPhase).handleCommand(Command.RUN, true, 0);
             success = true;
             break;
         }
