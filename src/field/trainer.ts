@@ -170,7 +170,7 @@ export default class Trainer extends Phaser.GameObjects.Container {
       name = i18next.t(`trainerNames:${this.config.nameDouble.toLowerCase().replace(/\s/g, "_")}`);
     }
 
-    console.log(title ? `${title} ${name}` : name);
+    // console.log(title ? `${title} ${name}` : name);
 
     // Return the formatted name, including the title if it is set.
     return title ? `${title} ${name}` : name;
