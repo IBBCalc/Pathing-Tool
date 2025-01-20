@@ -169,7 +169,11 @@ export class LearnMovePhase extends PlayerPartyMemberPokemonPhase {
         this.scene.tryRemovePhase((phase) => phase instanceof SelectModifierPhase);
       }
     }
-    LoggerTools.logActions(this.scene, this.scene.currentBattle.waveIndex, `${pokemon.name} | ${move.name} > ${pokemon.moveset[index]?.getName()}`);
+
+    if (pokemon.moveset[index] !== undefined) {
+      LoggerTools.logActions(this.scene, this.scene.currentBattle.waveIndex, `${pokemon.name} | ${move.name} > ${pokemon.moveset[index]?.getName()}`);
+    }
+
     pokemon.setMove(index, this.moveId);
     initMoveAnim(this.scene, this.moveId).then(() => {
       loadMoveAnimAssets(this.scene, [ this.moveId ], true);
