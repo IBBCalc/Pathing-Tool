@@ -256,7 +256,7 @@ export class TitlePhase extends Phase {
   logRenameMenu(): boolean {
     const options: OptionSelectItem[] = [];
     LoggerTools.getLogs();
-    this.setBiomeByType(Biome.FACTORY);
+    this.scene.newArena(Biome.FACTORY);
     for (let i = 0; i < LoggerTools.logs.length; i++) {
       if (localStorage.getItem(LoggerTools.logs[i][1]) != null) {
         options.push(LoggerTools.generateEditOption(this.scene, i, this.getSaves(), this) as OptionSelectItem);
@@ -551,7 +551,6 @@ export class TitlePhase extends Phase {
     options.push({
       label: i18next.t("menu:loadGame"),
       handler: () => {
-        this.scene.biomeChangeMode = false;
         this.scene.ui.setOverlayMode(Mode.SAVE_SLOT, SaveSlotUiMode.LOAD,
           (slotId: integer, autoSlot: integer) => {
             if (slotId === -1) {
