@@ -867,11 +867,11 @@ export default class PokemonSpecies extends PokemonSpeciesForm implements Locali
       ret.push([ prevolutionLevels[0][0], 1 ]);
       for (let l = 1; l < prevolutionLevels.length; l++) {
         const evolution = pokemonEvolutions[prevolutionLevels[l - 1][0]].find(e => e.speciesId === prevolutionLevels[l][0]);
-        ret.push([ prevolutionLevels[l][0], Math.min(Math.max((evolution?.level!) + Math.round(Utils.randSeedGauss(0.5, 1 + levelDiff * 0.2) * Math.max((evolution?.wildDelay!), 0.5) * 5) - 1, 2, (evolution?.level!)), currentLevel - 1) ]); // TODO: are those bangs correct?
+        ret.push([ prevolutionLevels[l][0], Math.min(Math.max((evolution?.level!) + Math.round(Utils.randSeedGauss(0.5, 1 + levelDiff * 0.2, "Prevolution level diff") * Math.max((evolution?.wildDelay!), 0.5) * 5) - 1, 2, (evolution?.level!)), currentLevel - 1) ]); // TODO: are those bangs correct?
       }
       const lastPrevolutionLevel = ret[prevolutionLevels.length - 1][1];
       const evolution = pokemonEvolutions[prevolutionLevels[prevolutionLevels.length - 1][0]].find(e => e.speciesId === this.speciesId);
-      ret.push([ this.speciesId, Math.min(Math.max(lastPrevolutionLevel + Math.round(Utils.randSeedGauss(0.5, 1 + levelDiff * 0.2) * Math.max((evolution?.wildDelay!), 0.5) * 5), lastPrevolutionLevel + 1, (evolution?.level!)), currentLevel) ]); // TODO: are those bangs correct?
+      ret.push([ this.speciesId, Math.min(Math.max(lastPrevolutionLevel + Math.round(Utils.randSeedGauss(0.5, 1 + levelDiff * 0.2, "Last prevolution level diff") * Math.max((evolution?.wildDelay!), 0.5) * 5), lastPrevolutionLevel + 1, (evolution?.level!)), currentLevel) ]); // TODO: are those bangs correct?
     } else {
       ret.push([ this.speciesId, 1 ]);
     }

@@ -74,7 +74,15 @@ export function randSeedGauss(stdev: number, mean: number = 0, reason?: string):
   const u = 1 - Phaser.Math.RND.realInRange(0, 1);
   const v = Phaser.Math.RND.realInRange(0, 1);
   const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
-  return z * stdev + mean;
+  const result = z * stdev + mean;
+  if (reason != "%HIDE" && doRNGLogging) {
+    if (reason) {
+      console.log(reason, result)
+    } else if (doUnlabeledRNGLogging) {
+      console.error("unlabeled randSeedInt", result)
+    }
+  }
+  return result;
 }
 
 export function padInt(value: integer, length: integer, padWith?: string): string {
@@ -174,6 +182,7 @@ export function randSeedShuffle<T>(items: T[]): T[] {
   const newArray = items.slice(0);
   for (let i = items.length - 1; i > 0; i--) {
     const j = Phaser.Math.RND.integerInRange(0, i);
+    console.log("randSeedShuffle", j);
     [ newArray[i], newArray[j] ] = [ newArray[j], newArray[i] ];
   }
   return newArray;

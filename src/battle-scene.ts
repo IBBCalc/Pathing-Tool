@@ -1597,28 +1597,28 @@ export default class BattleScene extends SceneBase {
       case Species.SQUAWKABILLY:
       case Species.TATSUGIRI:
       case Species.PALDEA_TAUROS:
-        return Utils.randSeedInt(species.forms.length);
+        return Utils.randSeedInt(species.forms.length, 0, "Species Form Default");
       case Species.PIKACHU:
         if (this.currentBattle?.battleType === BattleType.TRAINER && this.currentBattle?.waveIndex < 30) {
           return 0; // Ban Cosplay and Partner Pika from Trainers before wave 30
         }
-        return Utils.randSeedInt(8);
+        return Utils.randSeedInt(8, 0, "Species Form Pikachu");
       case Species.EEVEE:
         if (this.currentBattle?.battleType === BattleType.TRAINER && this.currentBattle?.waveIndex < 30) {
           return 0; // No Partner Eevee for Wave 12 Preschoolers
         }
-        return Utils.randSeedInt(2);
+        return Utils.randSeedInt(2, 0, "Species Form Eevee");
       case Species.GRENINJA:
         if (this.currentBattle?.battleType === BattleType.TRAINER) {
           return 0; // Don't give trainers Battle Bond Greninja
         }
-        return Utils.randSeedInt(2);
+        return Utils.randSeedInt(2, 0, "Species Form Greninja");
       case Species.ZYGARDE:
-        return Utils.randSeedInt(4);
+        return Utils.randSeedInt(4, 0, "Species Form Zygarde");
       case Species.MINIOR:
-        return Utils.randSeedInt(7);
+        return Utils.randSeedInt(7, 0, "Species Form Minior");
       case Species.ALCREMIE:
-        return Utils.randSeedInt(9);
+        return Utils.randSeedInt(9, 0, "Species Form Alcremie");
       case Species.MEOWSTIC:
       case Species.INDEEDEE:
       case Species.BASCULEGION:
@@ -1635,7 +1635,7 @@ export default class BattleScene extends SceneBase {
         if (this.gameMode.hasMysteryEncounters) {
           return 1; // Wandering form
         } else {
-          return Utils.randSeedInt(species.forms.length);
+          return Utils.randSeedInt(species.forms.length, 0, "Species Form Gimmighoul");
         }
     }
 
