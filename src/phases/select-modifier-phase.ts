@@ -194,10 +194,10 @@ export class SelectModifierPhase extends BattlePhase {
                     .then(succeed => {
                       if (!LoggerTools.isTransferAll.value && succeed) {
                         if (isAll) {
-                          LoggerTools.logActions(this.scene, this.scene.currentBattle.waveIndex, `Transfer ALL | ${party[fromSlotIndex].name} > ${party[toSlotIndex].name}`)
+                          LoggerTools.logActions(this.scene, this.scene.currentBattle.waveIndex, `** Transfer ALL | ${party[fromSlotIndex].name} > ${party[toSlotIndex].name} **`)
                           LoggerTools.isTransferAll.value = true
                         } else {
-                          LoggerTools.logActions(this.scene, this.scene.currentBattle.waveIndex, `Transfer ${itemQuantity > 1 ? itemQuantity + " " : ""}${itemModifier.type.name} | ${party[fromSlotIndex].name} > ${party[toSlotIndex].name}`)
+                          LoggerTools.logActions(this.scene, this.scene.currentBattle.waveIndex, `** Transfer ${itemQuantity > 1 ? itemQuantity + " " : ""}${itemModifier.type.name} | ${party[fromSlotIndex].name} > ${party[toSlotIndex].name} **`)
                         }
                       }
                     });

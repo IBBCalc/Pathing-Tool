@@ -176,7 +176,7 @@ export class TurnStartPhase extends FieldPhase {
         case Command.POKEMON:
           const switchType = turnCommand.args?.[0] ? SwitchType.BATON_PASS : SwitchType.SWITCH;
           if (pokemon.isPlayer()) {
-            LoggerTools.Actions[pokemon.getFieldIndex()] = `Switch ${pokemon.name} to ${this.scene.getPlayerParty()[turnCommand.cursor!].name}`;
+            LoggerTools.Actions[pokemon.getFieldIndex()] = `${(this.scene.currentBattle.turn == 1) ? "Switch (NOT Pre-Switch)" : "Switch"} ${pokemon.name} to ${this.scene.getPlayerParty()[turnCommand.cursor!].name}`;
           }
           this.scene.unshiftPhase(new SwitchSummonPhase(this.scene, switchType, pokemon.getFieldIndex(), turnCommand.cursor!, true, pokemon.isPlayer()));
           break;
