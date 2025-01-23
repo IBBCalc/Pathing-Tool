@@ -875,7 +875,7 @@ export class TitlePhase extends Phase {
         mu.level = 79;
         this.FillParty(party, comp, mu.level);
         mu.start = 35;
-        mu.end  = 50;
+        mu.end  = 49;
       },
       // (mu: {start: integer, end: integer, level: integer}) => {
       //   // Uses party of the save file
@@ -898,6 +898,15 @@ export class TitlePhase extends Phase {
 
     this.iterations = [];
 
+    // this.ClearParty(party);
+    // overrides.MOVESET_OVERRIDE = [Moves.TACKLE, Moves.SPLASH, Moves.SPLASH, Moves.SPLASH];
+    // this.FillParty(party, comps[0], 39);
+    // party[0].hp = 0;
+    // this.GenerateShop(party, "test", 9, 10);
+    // party[0].hp = party[0].getMaxHp();
+    // this.GenerateShop(party, "test", 9, 10);
+    // return
+
     mushroom.forEach(m => {
       var mu = {
         start: 0,
@@ -915,7 +924,7 @@ export class TitlePhase extends Phase {
 
         lures.forEach(lure => {
           var text = lure();
-          this.IteratePotions(party, 0, 0, 0, 0, 0, e, text, mu.start, mu.end, mu.level);
+          this.IteratePotions(party, 0, 0, 0, 0, 0, 0, e, text, mu.start, mu.end, mu.level);
         });
 
         e++;
@@ -964,10 +973,10 @@ export class TitlePhase extends Phase {
   //  Super Lure
   //  Max Lure
   //  Memory Mushroom
-  //
-  // Planned:
   //  Revive
   //  Max Revive
+  //
+  // Planned:
   //  Full Heal
   //  Full Restore
   //  Sacred Ash
@@ -980,12 +989,13 @@ export class TitlePhase extends Phase {
   //  Lock Capsule
   //  Dynamax Band
   //  Mega Bracelet
-  CreateLog(pot = 0, suppot = 0, hyppot = 0, maxpot = 0, eth = 0, lure = "", level = 79) {
+  CreateLog(pot = 0, suppot = 0, hyppot = 0, maxpot = 0, revive = 0, eth = 0, lure = "", level = 79) {
     var items: string[] = [];
     if (pot - suppot > 0) items.push(`${pot - suppot}x <87.5% HP and 10+ dmg taken`);
     if (suppot - hyppot > 0) items.push(`${suppot - hyppot}x <75% HP and 25+ dmg taken`);
     if (hyppot - maxpot > 0) items.push(`${hyppot - maxpot}x 50%-62.5% and 100+ dmg taken`);
-    if (maxpot > 0) items.push(`${maxpot}x <50% and 100+ dmg taken`);
+    if (maxpot - revive > 0) items.push(`${maxpot - revive}x <50% and 100+ dmg taken`);
+    if (revive > 0) items.push(`${revive}x fainted`);
     if (eth > 0) items.push(`${eth}x low PP`);
     if (lure != "") items.push(`${lure}`);
 
@@ -998,13 +1008,14 @@ export class TitlePhase extends Phase {
     return items.join(" + ");
   }
 
-  IteratePotions(party: PlayerPokemon[], n = 0, pot = 0, suppot = 0, hyppot = 0, maxpot = 0, eth = 0, lure = "", start = 1, end = 50, level = 79) {
+  IteratePotions(party: PlayerPokemon[], n = 0, pot = 0, suppot = 0, hyppot = 0, maxpot = 0, revive = 0, eth = 0, lure = "", start = 1, end = 50, level = 79) {
     if (n == Math.min(3, party.length)) {
-      var i = `${pot} ${suppot} ${hyppot} ${maxpot} ${eth} ${lure} ${level}`;
+      var i = `${pot} ${suppot} ${hyppot} ${maxpot} ${revive} ${eth} ${lure} ${level}`;
       if (this.iterations.some(it => it == i)) return;
 
       this.iterations.push(i)
-      this.GenerateShop(party, this.CreateLog(pot, suppot, hyppot, maxpot, eth, lure, level), start, end);
+      var comptext = this.CreateLog(pot, suppot, hyppot, maxpot, revive, eth, lure, level);
+      this.GenerateShop(party, comptext, start, end);
       return;
     }
 
@@ -1012,35 +1023,39 @@ export class TitlePhase extends Phase {
     var mhp = pokemon.getMaxHp();
 
     // Nothing
-    this.IteratePotions(party, n + 1, pot, suppot, hyppot, maxpot, eth, lure, start, end, level);
+    this.IteratePotions(party, n + 1, pot, suppot, hyppot, maxpot, revive, eth, lure, start, end, level);
 
     // potion
     var damage = Math.min(Math.max(Math.floor(mhp * 0.18), 10));
     if (damage < mhp) {
       pokemon.hp = mhp - damage;
-      this.IteratePotions(party, n + 1, pot + 1, suppot, hyppot, maxpot, eth, lure, start, end, level);
+      this.IteratePotions(party, n + 1, pot + 1, suppot, hyppot, maxpot, revive, eth, lure, start, end, level);
     }
 
     // super potion
     var damage = Math.min(Math.max(Math.floor(mhp * 0.31), 25));
     if (damage < mhp) {
       pokemon.hp = mhp - damage;
-      this.IteratePotions(party, n + 1, pot + 1, suppot + 1, hyppot, maxpot, eth, lure, start, end, level);
+      this.IteratePotions(party, n + 1, pot + 1, suppot + 1, hyppot, maxpot, revive, eth, lure, start, end, level);
     }
 
     // hyper potion
     var damage = Math.min(Math.max(Math.floor(mhp * 0.45), 100));
     if (damage < mhp && (mhp - damage) / mhp > 0.5) {
       pokemon.hp = mhp - damage;
-      this.IteratePotions(party, n + 1, pot + 1, suppot + 1, hyppot + 1, maxpot, eth, lure, start, end, level);
+      this.IteratePotions(party, n + 1, pot + 1, suppot + 1, hyppot + 1, maxpot, revive, eth, lure, start, end, level);
     }
 
     // max potion
     var damage = Math.min(Math.max(Math.floor(mhp * 0.51), 100));
     if (damage < mhp) {
       pokemon.hp = mhp - damage;
-      this.IteratePotions(party, n + 1, pot + 1, suppot + 1, hyppot + 1, maxpot + 1, eth, lure, start, end, level);
+      this.IteratePotions(party, n + 1, pot + 1, suppot + 1, hyppot + 1, maxpot + 1, revive, eth, lure, start, end, level);
     }
+
+    // Revive
+    pokemon.hp = 0;
+    this.IteratePotions(party, n + 1, pot + 1, suppot + 1, hyppot + 1, maxpot + 1, revive + 1, eth, lure, start, end, level);
 
     // reset pokemon
     pokemon.hp = pokemon.getMaxHp();
