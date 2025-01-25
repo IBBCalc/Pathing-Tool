@@ -1,4 +1,4 @@
-import BattleScene from "#app/battle-scene";
+import { globalScene } from "#app/global-scene";
 import { BattlerIndex } from "#app/battle";
 import { Command } from "#app/ui/command-ui-handler";
 import { FieldPhase } from "./field-phase";
@@ -20,11 +20,11 @@ export class EnemyCommandPhase extends FieldPhase {
   protected fieldIndex: integer;
   protected skipTurn: boolean = false;
 
-  constructor(scene: BattleScene, fieldIndex: integer) {
-    super(scene);
+  constructor(fieldIndex: integer) {
+    super();
 
     this.fieldIndex = fieldIndex;
-    if (this.scene.currentBattle.mysteryEncounter?.skipEnemyBattleTurns) {
+    if (globalScene.currentBattle.mysteryEncounter?.skipEnemyBattleTurns) {
       this.skipTurn = true;
     }
   }
@@ -32,10 +32,10 @@ export class EnemyCommandPhase extends FieldPhase {
   start() {
     super.start();
 
-    const enemyPokemon = this.scene.getEnemyField()[this.fieldIndex];
+    const enemyPokemon = globalScene.getEnemyField()[this.fieldIndex];
     console.log(enemyPokemon.getMoveset().map(m => m?.getName()));
 
-    const battle = this.scene.currentBattle;
+    const battle = globalScene.currentBattle;
 
     const trainer = battle.trainer;
 
@@ -72,16 +72,16 @@ export class EnemyCommandPhase extends FieldPhase {
 
             battle.turnCommands[this.fieldIndex + BattlerIndex.ENEMY] =
                 { command: Command.POKEMON, cursor: index, args: [ false ], skip: this.skipTurn };
-            console.log(enemyPokemon.name + " selects:", "Switch to " + this.scene.getEnemyParty()[index].name);
+            console.log(enemyPokemon.name + " selects:", "Switch to " + globalScene.getEnemyParty()[index].name);
 
             battle.enemySwitchCounter++;
 
             LoggerTools.enemyPlan[this.fieldIndex * 2] = "Switching out";
-            LoggerTools.enemyPlan[this.fieldIndex * 2 + 1] = "→ " + this.scene.getEnemyParty()[index].name;
+            LoggerTools.enemyPlan[this.fieldIndex * 2 + 1] = "→ " + globalScene.getEnemyParty()[index].name;
 
             enemyPokemon.flyout.setText();
 
-            this.scene.updateCatchRate();
+            globalScene.updateCatchRate();
 
             return this.end();
           }
@@ -93,15 +93,15 @@ export class EnemyCommandPhase extends FieldPhase {
     const nextMove = enemyPokemon.getNextMove();
     const mv = new PokemonMove(nextMove.move);
 
-    this.scene.currentBattle.turnCommands[this.fieldIndex + BattlerIndex.ENEMY] =
+    globalScene.currentBattle.turnCommands[this.fieldIndex + BattlerIndex.ENEMY] =
       { command: Command.FIGHT, move: nextMove, skip: this.skipTurn };
     const targetLabels = [ "Counter", "[PLAYER L]", "[PLAYER R]", "[ENEMY L]", "[ENEMY R]" ];
-    this.scene.getPlayerParty().forEach((v, i, a) => {
+    globalScene.getPlayerParty().forEach((v, i, a) => {
       if (v.isActive() && v.name) {
         targetLabels[i + 1] = v.name;
       }
     });
-    this.scene.getEnemyParty().forEach((v, i, a) => {
+    globalScene.getEnemyParty().forEach((v, i, a) => {
       if (v.isActive() && v.name) {
         targetLabels[i + 3] = v.name;
       }
@@ -117,13 +117,13 @@ export class EnemyCommandPhase extends FieldPhase {
       targetLabels[2] += " (R)";
     }
     console.log(enemyPokemon.name + " selects:", mv.getName() + " → " + nextMove.targets.map((m) => targetLabels[m + 1]));
-    this.scene.currentBattle.enemySwitchCounter = Math.max(this.scene.currentBattle.enemySwitchCounter - 1, 0);
+    globalScene.currentBattle.enemySwitchCounter = Math.max(globalScene.currentBattle.enemySwitchCounter - 1, 0);
 
     LoggerTools.enemyPlan[this.fieldIndex * 2] = mv.getName();
     LoggerTools.enemyPlan[this.fieldIndex * 2 + 1] = "→ " + nextMove.targets.map((m) => targetLabels[m + 1]);
-    this.scene.arenaFlyout.updateFieldText();
+    globalScene.arenaFlyout.updateFieldText();
 
-    this.scene.updateCatchRate();
+    globalScene.updateCatchRate();
 
     this.end();
   }

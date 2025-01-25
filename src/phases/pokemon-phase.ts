@@ -1,6 +1,6 @@
-import BattleScene from "#app/battle-scene";
+import { globalScene } from "#app/global-scene";
 import { BattlerIndex } from "#app/battle";
-import Pokemon from "#app/field/pokemon";
+import type Pokemon from "#app/field/pokemon";
 import { FieldPhase } from "./field-phase";
 import * as LoggerTools from "../logger";
 
@@ -9,11 +9,11 @@ export abstract class PokemonPhase extends FieldPhase {
   public player: boolean;
   public fieldIndex: integer;
 
-  constructor(scene: BattleScene, battlerIndex?: BattlerIndex | integer) {
-    super(scene);
+  constructor(battlerIndex?: BattlerIndex | integer) {
+    super();
 
     if (battlerIndex === undefined) {
-      battlerIndex = scene.getField().find(p => p?.isActive())!.getBattlerIndex(); // TODO: is the bang correct here?
+      battlerIndex = globalScene.getField().find(p => p?.isActive())!.getBattlerIndex(); // TODO: is the bang correct here?
     }
 
     this.battlerIndex = battlerIndex;
@@ -23,8 +23,8 @@ export abstract class PokemonPhase extends FieldPhase {
 
   getPokemon(): Pokemon {
     if (this.battlerIndex > BattlerIndex.ENEMY_2) {
-      return this.scene.getPokemonById(this.battlerIndex)!; //TODO: is this bang correct?
+      return globalScene.getPokemonById(this.battlerIndex)!; //TODO: is this bang correct?
     }
-    return this.scene.getField()[this.battlerIndex]!; //TODO: is this bang correct?
+    return globalScene.getField()[this.battlerIndex]!; //TODO: is this bang correct?
   }
 }

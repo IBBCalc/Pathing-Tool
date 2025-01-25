@@ -1,15 +1,18 @@
 import { addTextObject, TextStyle } from "./text";
-import BattleScene from "#app/battle-scene";
+import { globalScene } from "#app/global-scene";
 import { ArenaTagSide, ArenaTrapTag } from "#app/data/arena-tag";
 import { WeatherType } from "#enums/weather-type";
 import { TerrainType } from "#app/data/terrain";
 import { addWindow, WindowVariant } from "./ui-theme";
-import { ArenaEvent, ArenaEventType, TagAddedEvent, TagRemovedEvent, TerrainChangedEvent, WeatherChangedEvent } from "#app/events/arena";
-import { BattleSceneEventType, TurnEndEvent } from "../events/battle-scene";
+import type { ArenaEvent } from "#app/events/arena";
+import { ArenaEventType, TagAddedEvent, TagRemovedEvent, TerrainChangedEvent, WeatherChangedEvent } from "#app/events/arena";
+import type { TurnEndEvent } from "../events/battle-scene";
+import { BattleSceneEventType } from "../events/battle-scene";
 import { ArenaTagType } from "#enums/arena-tag-type";
 import TimeOfDayWidget from "./time-of-day-widget";
 import * as Utils from "../utils";
-import i18next, {ParseKeys} from "i18next";
+import type {ParseKeys} from "i18next";
+import i18next from "i18next";
 import { getNatureDecrease, getNatureIncrease, getNatureName } from "#app/data/nature.js";
 import * as LoggerTools from "../logger";
 import { Gender } from "#app/data/gender.js";
@@ -52,9 +55,6 @@ export function getFieldEffectText(arenaTagType: string): string {
 }
 
 export class ArenaFlyout extends Phaser.GameObjects.Container {
-  /** An alias for the scene typecast to a {@linkcode BattleScene} */
-  private battleScene: BattleScene;
-
   /** The restricted width of the flyout which should be drawn to */
   private flyoutWidth = 170;
   /** The restricted height of the flyout which should be drawn to */
@@ -111,62 +111,61 @@ export class ArenaFlyout extends Phaser.GameObjects.Container {
 
   public isAuto: boolean = false;
 
-  constructor(scene: Phaser.Scene) {
-    super(scene, 0, 0);
+  constructor() {
+    super(globalScene, 0, 0);
     this.setName("arena-flyout");
-    this.battleScene = this.scene as BattleScene;
 
     this.translationX = this.flyoutWidth;
     this.anchorX = 0;
     this.anchorY = -98;
 
-    this.flyoutParent = this.scene.add.container(this.anchorX - this.translationX, this.anchorY);
+    this.flyoutParent = globalScene.add.container(this.anchorX - this.translationX, this.anchorY);
     this.flyoutParent.setAlpha(0);
     this.add(this.flyoutParent);
 
-    this.flyoutContainer = this.scene.add.container(0, 0);
+    this.flyoutContainer = globalScene.add.container(0, 0);
     this.flyoutParent.add(this.flyoutContainer);
 
-    this.flyoutWindow = addWindow(this.scene as BattleScene, 0, 0, this.flyoutWidth, this.flyoutHeight, false, false, 0, 0, WindowVariant.THIN);
+    this.flyoutWindow = addWindow(0, 0, this.flyoutWidth, this.flyoutHeight, false, false, 0, 0, WindowVariant.THIN);
     this.flyoutContainer.add(this.flyoutWindow);
 
-    this.flyoutWindowHeader = addWindow(this.scene as BattleScene, this.flyoutWidth / 2, 0, this.flyoutWidth / 2, 14, false, false, 0, 0, WindowVariant.XTHIN);
+    this.flyoutWindowHeader = addWindow(this.flyoutWidth / 2, 0, this.flyoutWidth / 2, 14, false, false, 0, 0, WindowVariant.XTHIN);
     this.flyoutWindowHeader.setOrigin();
 
     this.flyoutContainer.add(this.flyoutWindowHeader);
 
-    this.flyoutTextHeader = addTextObject(this.scene, this.flyoutWidth / 2, 0, i18next.t("arenaFlyout:activeBattleEffects"), TextStyle.BATTLE_INFO);
+    this.flyoutTextHeader = addTextObject(this.flyoutWidth / 2, 0, i18next.t("arenaFlyout:activeBattleEffects"), TextStyle.BATTLE_INFO);
     this.flyoutTextHeader.setFontSize(54);
     this.flyoutTextHeader.setAlign("center");
     this.flyoutTextHeader.setOrigin();
 
     this.flyoutContainer.add(this.flyoutTextHeader);
 
-    this.timeOfDayWidget = new TimeOfDayWidget(this.scene, (this.flyoutWidth / 2) + (this.flyoutWindowHeader.displayWidth / 2));
+    this.timeOfDayWidget = new TimeOfDayWidget((this.flyoutWidth / 2) + (this.flyoutWindowHeader.displayWidth / 2));
     this.flyoutContainer.add(this.timeOfDayWidget);
 
-    this.flyoutTextHeaderPlayer = addTextObject(this.scene, 6, 5, i18next.t("arenaFlyout:player"), TextStyle.SUMMARY_BLUE);
+    this.flyoutTextHeaderPlayer = addTextObject(6, 5, i18next.t("arenaFlyout:player"), TextStyle.SUMMARY_BLUE);
     this.flyoutTextHeaderPlayer.setFontSize(54);
     this.flyoutTextHeaderPlayer.setAlign("left");
     this.flyoutTextHeaderPlayer.setOrigin(0, 0);
 
     this.flyoutContainer.add(this.flyoutTextHeaderPlayer);
 
-    this.flyoutTextHeaderField = addTextObject(this.scene, this.flyoutWidth / 2, 5, i18next.t("arenaFlyout:neutral"), TextStyle.SUMMARY_GREEN);
+    this.flyoutTextHeaderField = addTextObject(this.flyoutWidth / 2, 5, i18next.t("arenaFlyout:neutral"), TextStyle.SUMMARY_GREEN);
     this.flyoutTextHeaderField.setFontSize(54);
     this.flyoutTextHeaderField.setAlign("center");
     this.flyoutTextHeaderField.setOrigin(0.5, 0);
 
     this.flyoutContainer.add(this.flyoutTextHeaderField);
 
-    this.flyoutTextHeaderEnemy = addTextObject(this.scene, this.flyoutWidth - 6, 5, i18next.t("arenaFlyout:enemy"), TextStyle.SUMMARY_RED);
+    this.flyoutTextHeaderEnemy = addTextObject(this.flyoutWidth - 6, 5, i18next.t("arenaFlyout:enemy"), TextStyle.SUMMARY_RED);
     this.flyoutTextHeaderEnemy.setFontSize(54);
     this.flyoutTextHeaderEnemy.setAlign("right");
     this.flyoutTextHeaderEnemy.setOrigin(1, 0);
 
     this.flyoutContainer.add(this.flyoutTextHeaderEnemy);
 
-    this.flyoutTextPlayer = addTextObject(this.scene, 6, 13, "", TextStyle.BATTLE_INFO);
+    this.flyoutTextPlayer = addTextObject(6, 13, "", TextStyle.BATTLE_INFO);
     this.flyoutTextPlayer.setLineSpacing(-1);
     this.flyoutTextPlayer.setFontSize(48);
     this.flyoutTextPlayer.setAlign("left");
@@ -174,7 +173,7 @@ export class ArenaFlyout extends Phaser.GameObjects.Container {
 
     this.flyoutContainer.add(this.flyoutTextPlayer);
 
-    this.flyoutTextField = addTextObject(this.scene, this.flyoutWidth / 2, 13, "", TextStyle.BATTLE_INFO);
+    this.flyoutTextField = addTextObject(this.flyoutWidth / 2, 13, "", TextStyle.BATTLE_INFO);
     this.flyoutTextField.setLineSpacing(-1);
     this.flyoutTextField.setFontSize(48);
     this.flyoutTextField.setAlign("center");
@@ -182,7 +181,7 @@ export class ArenaFlyout extends Phaser.GameObjects.Container {
 
     this.flyoutContainer.add(this.flyoutTextField);
 
-    this.flyoutTextEnemy = addTextObject(this.scene, this.flyoutWidth - 6, 13, "", TextStyle.BATTLE_INFO);
+    this.flyoutTextEnemy = addTextObject(this.flyoutWidth - 6, 13, "", TextStyle.BATTLE_INFO);
     this.flyoutTextEnemy.setLineSpacing(-1);
     this.flyoutTextEnemy.setFontSize(48);
     this.flyoutTextEnemy.setAlign("right");
@@ -194,8 +193,8 @@ export class ArenaFlyout extends Phaser.GameObjects.Container {
     this.flyoutParent.name = "Fight Flyout Parent";
 
     // Subscribes to required events available on game start
-    this.battleScene.eventTarget.addEventListener(BattleSceneEventType.NEW_ARENA, this.onNewArenaEvent);
-    this.battleScene.eventTarget.addEventListener(BattleSceneEventType.TURN_END,  this.onTurnEndEvent);
+    globalScene.eventTarget.addEventListener(BattleSceneEventType.NEW_ARENA, this.onNewArenaEvent);
+    globalScene.eventTarget.addEventListener(BattleSceneEventType.TURN_END,  this.onTurnEndEvent);
 
     this.shinyCharmIcon = this.scene.add.sprite(this.flyoutWidth - 8, 8, "items", "shiny_charm")
     this.shinyCharmIcon.setScale(0.4)
@@ -203,7 +202,7 @@ export class ArenaFlyout extends Phaser.GameObjects.Container {
     this.shinyCharmIcon.setVisible(false)
     this.flyoutContainer.add(this.shinyCharmIcon)
 
-    this.shinyCharmLuckCount = addTextObject(this.scene, this.flyoutWidth - 9, 5, "?", TextStyle.BATTLE_INFO);
+    this.shinyCharmLuckCount = addTextObject(this.flyoutWidth - 9, 5, "?", TextStyle.BATTLE_INFO);
     this.shinyCharmLuckCount.setLineSpacing(-1);
     this.shinyCharmLuckCount.setFontSize(40);
     this.shinyCharmLuckCount.setAlign("center");
@@ -212,7 +211,7 @@ export class ArenaFlyout extends Phaser.GameObjects.Container {
   }
 
   doShinyCharmTooltip() {
-    if (true || (this.scene as BattleScene).currentBattle.waveIndex % 10 == 0) {
+    if (true || globalScene.currentBattle.waveIndex % 10 == 0) {
       this.shinyCharmIcon.setVisible(false)
       this.shinyCharmLuckCount.setVisible(false)
       return;
@@ -221,21 +220,21 @@ export class ArenaFlyout extends Phaser.GameObjects.Container {
     this.shinyCharmLuckCount.setVisible(true)
     if (true) { // this.shinyCharmIcon.visible
       this.shinyCharmIcon.removeAllListeners()
-      if (!(this.scene as BattleScene).waveShinyChecked) {
+      if (!globalScene.waveShinyChecked) {
         this.shinyCharmIcon.setVisible(false)
         this.shinyCharmLuckCount.setVisible(false)
         return;
-        //this.shinyCharmIcon.on("pointerover", () => (this.scene as BattleScene).ui.showTooltip(null, `???`));
-      } else if ((this.scene as BattleScene).waveShinyFlag) {
+        //this.shinyCharmIcon.on("pointerover", () => globalScene.ui.showTooltip(null, `???`));
+      } else if (globalScene.waveShinyFlag) {
         this.shinyCharmIcon.clearTint()
-        this.shinyCharmIcon.on("pointerover", () => (this.scene as BattleScene).ui.showTooltip("", `Shinies are OK`));
+        this.shinyCharmIcon.on("pointerover", () => globalScene.ui.showTooltip("", `Shinies are OK`));
         this.shinyCharmLuckCount.setVisible(false)
       } else {
         this.shinyCharmIcon.setTintFill(0x000000)
-        this.shinyCharmIcon.on("pointerover", () => (this.scene as BattleScene).ui.showTooltip("", `Shinies change shop with luck ${(this.scene as BattleScene).waveShinyMinToBreak} or higher`));
-        this.shinyCharmLuckCount.text = getLuckString((this.scene as BattleScene).waveShinyMinToBreak)
+        this.shinyCharmIcon.on("pointerover", () => globalScene.ui.showTooltip("", `Shinies change shop with luck ${globalScene.waveShinyMinToBreak} or higher`));
+        this.shinyCharmLuckCount.text = getLuckString(globalScene.waveShinyMinToBreak)
       }
-      this.shinyCharmIcon.on("pointerout", () => (this.scene as BattleScene).ui.hideTooltip());
+      this.shinyCharmIcon.on("pointerout", () => globalScene.ui.hideTooltip());
     }
   }
 
@@ -243,10 +242,10 @@ export class ArenaFlyout extends Phaser.GameObjects.Container {
     this.fieldEffectInfo.length = 0;
 
     // Subscribes to required events available on battle start
-    this.battleScene.arena.eventTarget.addEventListener(ArenaEventType.WEATHER_CHANGED, this.onFieldEffectChangedEvent);
-    this.battleScene.arena.eventTarget.addEventListener(ArenaEventType.TERRAIN_CHANGED, this.onFieldEffectChangedEvent);
-    this.battleScene.arena.eventTarget.addEventListener(ArenaEventType.TAG_ADDED,       this.onFieldEffectChangedEvent);
-    this.battleScene.arena.eventTarget.addEventListener(ArenaEventType.TAG_REMOVED,     this.onFieldEffectChangedEvent);
+    globalScene.arena.eventTarget.addEventListener(ArenaEventType.WEATHER_CHANGED, this.onFieldEffectChangedEvent);
+    globalScene.arena.eventTarget.addEventListener(ArenaEventType.TERRAIN_CHANGED, this.onFieldEffectChangedEvent);
+    globalScene.arena.eventTarget.addEventListener(ArenaEventType.TAG_ADDED,       this.onFieldEffectChangedEvent);
+    globalScene.arena.eventTarget.addEventListener(ArenaEventType.TAG_REMOVED,     this.onFieldEffectChangedEvent);
   }
 
 
@@ -271,10 +270,10 @@ export class ArenaFlyout extends Phaser.GameObjects.Container {
     this.flyoutTextPlayer.setPosition(6, 4)
     this.flyoutTextPlayer.setFontSize(30);
     var instructions: string[] = []
-    var drpd = LoggerTools.getDRPD(this.scene as BattleScene);
+    var drpd = LoggerTools.getDRPD();
     var doWaveInstructions = true;
     for (var i = 0; i < drpd.waves.length && drpd.waves[i] != undefined && doWaveInstructions; i++) {
-      if (drpd.waves[i].id > (this.scene as BattleScene).currentBattle.waveIndex) {
+      if (drpd.waves[i].id > globalScene.currentBattle.waveIndex) {
         doWaveInstructions = false;
       } else {
         instructions.push("")
@@ -303,7 +302,7 @@ export class ArenaFlyout extends Phaser.GameObjects.Container {
   display2() {
     this.doShinyCharmTooltip()
     this.clearText()
-    var poke = (this.scene as BattleScene).getEnemyField()
+    var poke = globalScene.getEnemyField()
     this.flyoutTextPlayer.text = ""
     this.flyoutTextField.text = ""
     this.flyoutTextEnemy.text = ""
@@ -311,7 +310,7 @@ export class ArenaFlyout extends Phaser.GameObjects.Container {
     this.flyoutTextHeaderPlayer.text = ""
     this.flyoutTextHeaderEnemy.text = ""
     this.flyoutTextHeader.text = "IVs"
-    this.flyoutTextHeader.text = getBiomeName((this.scene as BattleScene).arena.biomeType) + " - " + (this.scene as BattleScene).currentBattle.waveIndex
+    this.flyoutTextHeader.text = getBiomeName(globalScene.arena.biomeType) + " - " + globalScene.currentBattle.waveIndex
     for (var i = 0; i < poke.length; i++) {
       if (i == 1 || true) {
         var formtext = ""
@@ -398,7 +397,7 @@ export class ArenaFlyout extends Phaser.GameObjects.Container {
     if (poke.length < 1) {
       //this.flyoutTextEnemy.text += "\n\n"
     }
-    //this.flyoutTextEnemy.text += ((this.scene as BattleScene).waveShinyChecked ? ((this.scene as BattleScene).waveShinyFlag ? "Shiny Luck: OK" : "Shiny Pokemon will change this floor's shop!") : "Shiny Luck: Not checked")
+    //this.flyoutTextEnemy.text += (globalScene.waveShinyChecked ? (globalScene.waveShinyFlag ? "Shiny Luck: OK" : "Shiny Pokemon will change this floor's shop!") : "Shiny Luck: Not checked")
   }
 
   public printIVs() {
@@ -464,7 +463,7 @@ export class ArenaFlyout extends Phaser.GameObjects.Container {
     switch (arenaEffectChangedEvent.constructor) {
       case TagAddedEvent:
         const tagAddedEvent = arenaEffectChangedEvent as TagAddedEvent;
-        const isArenaTrapTag = this.battleScene.arena.getTag(tagAddedEvent.arenaTagType) instanceof ArenaTrapTag;
+        const isArenaTrapTag = globalScene.arena.getTag(tagAddedEvent.arenaTagType) instanceof ArenaTrapTag;
         let arenaEffectType: ArenaEffectType;
 
         if (tagAddedEvent.arenaTagSide === ArenaTagSide.BOTH) {
@@ -577,7 +576,7 @@ export class ArenaFlyout extends Phaser.GameObjects.Container {
    */
   public toggleFlyout(visible: boolean): void {
     this.isAuto = false;
-    this.scene.tweens.add({
+    globalScene.tweens.add({
       targets: this.flyoutParent,
       x: visible ? this.anchorX : this.anchorX - this.translationX,
       duration: Utils.fixedInt(125),
@@ -594,13 +593,13 @@ export class ArenaFlyout extends Phaser.GameObjects.Container {
   }
 
   public destroy(fromScene?: boolean): void {
-    this.battleScene.eventTarget.removeEventListener(BattleSceneEventType.NEW_ARENA, this.onNewArenaEvent);
-    this.battleScene.eventTarget.removeEventListener(BattleSceneEventType.TURN_END,  this.onTurnEndEvent);
+    globalScene.eventTarget.removeEventListener(BattleSceneEventType.NEW_ARENA, this.onNewArenaEvent);
+    globalScene.eventTarget.removeEventListener(BattleSceneEventType.TURN_END,  this.onTurnEndEvent);
 
-    this.battleScene.arena.eventTarget.removeEventListener(ArenaEventType.WEATHER_CHANGED, this.onFieldEffectChangedEvent);
-    this.battleScene.arena.eventTarget.removeEventListener(ArenaEventType.TERRAIN_CHANGED, this.onFieldEffectChangedEvent);
-    this.battleScene.arena.eventTarget.removeEventListener(ArenaEventType.TAG_ADDED,       this.onFieldEffectChangedEvent);
-    this.battleScene.arena.eventTarget.removeEventListener(ArenaEventType.TAG_REMOVED,     this.onFieldEffectChangedEvent);
+    globalScene.arena.eventTarget.removeEventListener(ArenaEventType.WEATHER_CHANGED, this.onFieldEffectChangedEvent);
+    globalScene.arena.eventTarget.removeEventListener(ArenaEventType.TERRAIN_CHANGED, this.onFieldEffectChangedEvent);
+    globalScene.arena.eventTarget.removeEventListener(ArenaEventType.TAG_ADDED,       this.onFieldEffectChangedEvent);
+    globalScene.arena.eventTarget.removeEventListener(ArenaEventType.TAG_REMOVED,     this.onFieldEffectChangedEvent);
 
     super.destroy(fromScene);
   }

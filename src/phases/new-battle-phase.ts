@@ -1,15 +1,15 @@
+import { globalScene } from "#app/global-scene";
 import { BattlePhase } from "./battle-phase";
-import BattleScene from "#app/battle-scene.js";
 
 export class NewBattlePhase extends BattlePhase {
-  constructor(scene: BattleScene) {
-    super(scene);
+  constructor() {
+    super();
   }
 
   start() {
     super.start();
 
-    this.scene.newBattle();
+    globalScene.newBattle();
 
     this.end();
   }

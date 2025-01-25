@@ -1,5 +1,6 @@
+import { globalScene } from "#app/global-scene";
 import { BattleSpec } from "#enums/battle-spec";
-import Pokemon from "./field/pokemon";
+import type Pokemon from "./field/pokemon";
 import i18next from "i18next";
 
 /**
@@ -15,7 +16,7 @@ export function getPokemonNameWithAffix(pokemon: Pokemon | undefined): string {
     return pokemon.getNameToRender();
   }
 
-  switch (pokemon.scene.currentBattle.battleSpec) {
+  switch (globalScene.currentBattle.battleSpec) {
     case BattleSpec.DEFAULT:
       return !pokemon.isPlayer()
         ? pokemon.hasTrainer()

@@ -43,6 +43,7 @@ export default [
             "computed-property-spacing": "off", // Enforces consistent spacing inside computed property brackets
             "space-infix-ops": "off", // Enforces spacing around infix operators
             "no-multiple-empty-lines": "off", // Disallows multiple empty lines
+            "@typescript-eslint/consistent-type-imports": "off", // Enforces type-only imports wherever possible
         }
     }
 ]

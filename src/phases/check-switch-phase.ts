@@ -1,4 +1,4 @@
-import BattleScene from "#app/battle-scene";
+import { globalScene } from "#app/global-scene";
 import { BattleStyle } from "#app/enums/battle-style";
 import { BattlerTagType } from "#app/enums/battler-tag-type";
 import { getPokemonNameWithAffix } from "#app/messages";
@@ -15,8 +15,8 @@ export class CheckSwitchPhase extends BattlePhase {
   protected fieldIndex: integer;
   protected useName: boolean;
 
-  constructor(scene: BattleScene, fieldIndex: integer, useName: boolean) {
-    super(scene);
+  constructor(fieldIndex: integer, useName: boolean) {
+    super();
 
     this.fieldIndex = fieldIndex;
     this.useName = useName;
@@ -25,35 +25,35 @@ export class CheckSwitchPhase extends BattlePhase {
   start() {
     super.start();
 
-    const pokemon = this.scene.getPlayerField()[this.fieldIndex];
+    const pokemon = globalScene.getPlayerField()[this.fieldIndex];
 
     // End this phase early...
 
     // ...if the user is playing in Set Mode
-    if (this.scene.battleStyle === BattleStyle.SET) {
+    if (globalScene.battleStyle === BattleStyle.SET) {
       return super.end();
     }
 
     // ...if the checked Pokemon is somehow not on the field
-    if (this.scene.field.getAll().indexOf(pokemon) === -1) {
-      this.scene.unshiftPhase(new SummonMissingPhase(this.scene, this.fieldIndex));
+    if (globalScene.field.getAll().indexOf(pokemon) === -1) {
+      globalScene.unshiftPhase(new SummonMissingPhase(this.fieldIndex));
       return super.end();
     }
 
     // ...if there are no other allowed Pokemon in the player's party to switch with
-    if (!this.scene.getPlayerParty().slice(1).filter(p => p.isActive()).length) {
+    if (!globalScene.getPlayerParty().slice(1).filter(p => p.isActive()).length) {
       return super.end();
     }
 
     // ...or if any player Pokemon has an effect that prevents the checked Pokemon from switching
     if (pokemon.getTag(BattlerTagType.FRENZY)
         || pokemon.isTrapped()
-        || this.scene.getPlayerField().some(p => p.getTag(BattlerTagType.COMMANDED))) {
+        || globalScene.getPlayerField().some(p => p.getTag(BattlerTagType.COMMANDED))) {
       return super.end();
     }
 
-    for (var i = 0; i < this.scene.getEnemyField().length; i++) {
-      var pk = this.scene.getEnemyField()[i]
+    for (var i = 0; i < globalScene.getEnemyField().length; i++) {
+      var pk = globalScene.getEnemyField()[i]
       var maxIVs: string[] = []
       var ivnames = ["HP", "Atk", "Def", "Sp.Atk", "Sp.Def", "Speed"]
       pk.ivs.forEach((iv, j) => {
@@ -76,34 +76,34 @@ if (iv == 31) maxIVs.push(ivnames[j])
       }
     }
 
-    this.scene.ui.showText(i18next.t("battle:switchQuestion", { pokemonName: this.useName ? getPokemonNameWithAffix(pokemon) : i18next.t("battle:pokemon") }), null, () => {
-      this.scene.ui.setMode(Mode.CONFIRM, () => {
+    globalScene.ui.showText(i18next.t("battle:switchQuestion", { pokemonName: this.useName ? getPokemonNameWithAffix(pokemon) : i18next.t("battle:pokemon") }), null, () => {
+      globalScene.ui.setMode(Mode.CONFIRM, () => {
         // Yes, I want to Pre-Switch
-        this.scene.ui.setMode(Mode.MESSAGE);
-        this.scene.unshiftPhase(new SwitchPhase(this.scene, SwitchType.INITIAL_SWITCH, this.fieldIndex, false, true));
-        for (var i = 0; i < this.scene.getEnemyField().length; i++) {
-          this.scene.getEnemyField()[i].getBattleInfo().flyoutMenu.toggleFlyout(false)
-          this.scene.getEnemyField()[i].getBattleInfo().flyoutMenu.flyoutText[0].text = "???"
-          this.scene.getEnemyField()[i].getBattleInfo().flyoutMenu.flyoutText[1].text = "???"
-          this.scene.getEnemyField()[i].getBattleInfo().flyoutMenu.flyoutText[2].text = "???"
-          this.scene.getEnemyField()[i].getBattleInfo().flyoutMenu.flyoutText[3].text = "???"
-          this.scene.getEnemyField()[i].getBattleInfo().flyoutMenu.flyoutText[2].setColor("#f8f8f8")
-          this.scene.getEnemyField()[i].flyout.setText()
+        globalScene.ui.setMode(Mode.MESSAGE);
+        globalScene.unshiftPhase(new SwitchPhase(SwitchType.INITIAL_SWITCH, this.fieldIndex, false, true));
+        for (var i = 0; i < globalScene.getEnemyField().length; i++) {
+          globalScene.getEnemyField()[i].getBattleInfo().flyoutMenu.toggleFlyout(false)
+          globalScene.getEnemyField()[i].getBattleInfo().flyoutMenu.flyoutText[0].text = "???"
+          globalScene.getEnemyField()[i].getBattleInfo().flyoutMenu.flyoutText[1].text = "???"
+          globalScene.getEnemyField()[i].getBattleInfo().flyoutMenu.flyoutText[2].text = "???"
+          globalScene.getEnemyField()[i].getBattleInfo().flyoutMenu.flyoutText[3].text = "???"
+          globalScene.getEnemyField()[i].getBattleInfo().flyoutMenu.flyoutText[2].setColor("#f8f8f8")
+          globalScene.getEnemyField()[i].flyout.setText()
         }
-        //this.scene.pokemonInfoContainer.hide()
+        //globalScene.pokemonInfoContainer.hide()
         this.end();
       }, () => {
         // No, I want to leave my Pokémon as is
-        this.scene.ui.setMode(Mode.MESSAGE);
-        for (var i = 0; i < this.scene.getEnemyField().length; i++) {
-          this.scene.getEnemyField()[i].getBattleInfo().flyoutMenu.toggleFlyout(false)
-          this.scene.getEnemyField()[i].getBattleInfo().flyoutMenu.flyoutText[0].text = "???"
-          this.scene.getEnemyField()[i].getBattleInfo().flyoutMenu.flyoutText[1].text = "???"
-          this.scene.getEnemyField()[i].getBattleInfo().flyoutMenu.flyoutText[2].text = "???"
-          this.scene.getEnemyField()[i].getBattleInfo().flyoutMenu.flyoutText[3].text = "???"
-          this.scene.getEnemyField()[i].getBattleInfo().flyoutMenu.flyoutText[2].setColor("#f8f8f8")
+        globalScene.ui.setMode(Mode.MESSAGE);
+        for (var i = 0; i < globalScene.getEnemyField().length; i++) {
+          globalScene.getEnemyField()[i].getBattleInfo().flyoutMenu.toggleFlyout(false)
+          globalScene.getEnemyField()[i].getBattleInfo().flyoutMenu.flyoutText[0].text = "???"
+          globalScene.getEnemyField()[i].getBattleInfo().flyoutMenu.flyoutText[1].text = "???"
+          globalScene.getEnemyField()[i].getBattleInfo().flyoutMenu.flyoutText[2].text = "???"
+          globalScene.getEnemyField()[i].getBattleInfo().flyoutMenu.flyoutText[3].text = "???"
+          globalScene.getEnemyField()[i].getBattleInfo().flyoutMenu.flyoutText[2].setColor("#f8f8f8")
         }
-        //this.scene.pokemonInfoContainer.hide()
+        //globalScene.pokemonInfoContainer.hide()
         this.end();
       });
     });
