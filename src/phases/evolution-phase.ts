@@ -198,10 +198,10 @@ export class EvolutionPhase extends Phase {
                       this.evolutionHandler.canCancel = true;
                       this.doCycle(1).then(success => {
                         if (success) {
-                          LoggerTools.logActions(this.scene, this.scene.currentBattle.waveIndex, `Let ${this.pokemon.name} Evolve`)
+                          LoggerTools.logActions(globalScene.currentBattle.waveIndex, `Let ${this.pokemon.name} Evolve`)
                           this.handleSuccessEvolution(evolvedPokemon);
                         } else {
-                          LoggerTools.logActions(this.scene, this.scene.currentBattle.waveIndex, `DO NOT LET ${this.pokemon.name} Evolve`)
+                          LoggerTools.logActions(globalScene.currentBattle.waveIndex, `DO NOT LET ${this.pokemon.name} Evolve`)
                           this.handleFailedEvolution(evolvedPokemon);
                         }
                       });

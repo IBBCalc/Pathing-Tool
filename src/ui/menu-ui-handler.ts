@@ -87,7 +87,7 @@ export default class MenuUiHandler extends MessageUiHandler {
     super(mode);
 
     this.excludedMenus = () => [
-      { condition: [ Mode.COMMAND, Mode.TITLE ].includes(mode ?? Mode.TITLE), options: [ MenuOptions.EGG_GACHA, MenuOptions.EGG_LIST ]},
+      { condition: [ Mode.COMMAND, Mode.TITLE ].includes(mode ?? Mode.TITLE), options: [ MenuOptions.EGG_GACHA ]},
       { condition: bypassLogin, options: [ MenuOptions.LOG_OUT ]}
     ];
 
@@ -383,7 +383,7 @@ export default class MenuUiHandler extends MessageUiHandler {
       {
         label: i18next.t("menuUiHandler:cancel"),
         handler: () => {
-          this.scene.ui.revertMode();
+          globalScene.ui.revertMode();
           return true;
         },
         keepOpen: true
@@ -425,7 +425,7 @@ export default class MenuUiHandler extends MessageUiHandler {
     siteOptions.push({
       label: i18next.t("menuUiHandler:cancel"),
       handler: () => {
-        this.scene.ui.revertMode();
+        globalScene.ui.revertMode();
         return true;
       },
       keepOpen: true

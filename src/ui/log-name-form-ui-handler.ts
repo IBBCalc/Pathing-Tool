@@ -5,6 +5,7 @@ import { Mode } from "./ui";
 import i18next from "i18next";
 import * as LoggerTools from "../logger";
 import { addTextObject, TextStyle } from "./text";
+import { globalScene } from "#app/global-scene.js";
 
 export default class LogNameFormUiHandler extends FormModalUiHandler {
   name: string;
@@ -59,7 +60,7 @@ export default class LogNameFormUiHandler extends FormModalUiHandler {
   setup(): void {
     super.setup();
 
-    //const label = addTextObject(this.scene, 10, 87, "Clicking Export or ExSheets does NOT save any text you entered\nPress \"Rename\", then reopen this menu and click Export", TextStyle.TOOLTIP_CONTENT, { fontSize: "42px" });
+    //const label = addTextObject(globalScene, 10, 87, "Clicking Export or ExSheets does NOT save any text you entered\nPress \"Rename\", then reopen this menu and click Export", TextStyle.TOOLTIP_CONTENT, { fontSize: "42px" });
     //this.modalContainer.add(label);
 
     this.inputs[0].maxLength = 99;
@@ -82,10 +83,10 @@ export default class LogNameFormUiHandler extends FormModalUiHandler {
         // Prevent overlapping overrides on action modification
         this.submitAction = originalLoginAction;
         this.sanitizeInputs();
-        this.scene.ui.setMode(Mode.LOADING, { buttonActions: [] });
+        globalScene.ui.setMode(Mode.LOADING, { buttonActions: [] });
         const onFail = error => {
-          this.scene.ui.setMode(Mode.NAME_LOG, Object.assign(config, { errorMessage: error?.trim() }));
-          this.scene.ui.playError();
+          globalScene.ui.setMode(Mode.NAME_LOG, Object.assign(config, { errorMessage: error?.trim() }));
+          globalScene.ui.playError();
         };
         if (!this.inputs[0].text) {
           //return onFail(i18next.t("menu:emptyUsername"));

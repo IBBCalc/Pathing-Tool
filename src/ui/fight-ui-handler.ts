@@ -419,7 +419,7 @@ export default class FightUiHandler extends UiHandler implements InfoToggle {
         case MoveData.MultiHitType._10:
           minHits = 10;
         case MoveData.MultiHitType.BEAT_UP:
-          const party = user.isPlayer() ? user.scene.getPlayerParty() : user.scene.getEnemyParty();
+          const party = user.isPlayer() ? globalScene.getPlayerParty() : globalScene.getEnemyParty();
           // No status means the ally pokemon can contribute to Beat Up
           minHits = party.reduce((total, pokemon) => {
             return total + (pokemon.id === user.id ? 1 : pokemon?.status && pokemon.status.effect !== StatusEffect.NONE ? 0 : 1);

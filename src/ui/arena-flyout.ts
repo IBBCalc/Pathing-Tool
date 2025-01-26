@@ -196,7 +196,7 @@ export class ArenaFlyout extends Phaser.GameObjects.Container {
     globalScene.eventTarget.addEventListener(BattleSceneEventType.NEW_ARENA, this.onNewArenaEvent);
     globalScene.eventTarget.addEventListener(BattleSceneEventType.TURN_END,  this.onTurnEndEvent);
 
-    this.shinyCharmIcon = this.scene.add.sprite(this.flyoutWidth - 8, 8, "items", "shiny_charm")
+    this.shinyCharmIcon = globalScene.add.sprite(this.flyoutWidth - 8, 8, "items", "shiny_charm")
     this.shinyCharmIcon.setScale(0.4)
     this.shinyCharmIcon.setInteractive(new Phaser.Geom.Rectangle(2, 2, 26, 27), Phaser.Geom.Rectangle.Contains);
     this.shinyCharmIcon.setVisible(false)
