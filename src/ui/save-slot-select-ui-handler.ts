@@ -12,7 +12,7 @@ import { addWindow } from "./ui-theme";
 import { allpanels, biomePanelIDs } from "../loading-scene"
 import { RunDisplayMode } from "#app/ui/run-info-ui-handler";
 import { getBiomeName } from "#app/data/balance/biomes.js";
-import { Modifier, PokemonHeldItemModifier } from "#app/modifier/modifier.js";
+import * as Modifier from "../modifier/modifier";
 
 const SESSION_SLOTS_COUNT = 5;
 const SLOTS_ON_SCREEN = 3;
@@ -425,14 +425,14 @@ class SessionSlot extends Phaser.GameObjects.Container {
     const itemDisplayLimit = 9
     for (const m of data.modifiers) {
       const modifier = m.toModifier(Modifier[m.className]);
-      if (modifier instanceof PokemonHeldItemModifier) {
+      if (modifier instanceof Modifier.PokemonHeldItemModifier) {
         continue;
       }
       numberOfModifiers++;
     }
     for (const m of data.modifiers) {
       const modifier = m.toModifier(Modifier[m.className]);
-      if (modifier instanceof PokemonHeldItemModifier) {
+      if (modifier instanceof Modifier.PokemonHeldItemModifier) {
         continue;
       }
       const icon = modifier?.getIcon(false);
