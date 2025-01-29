@@ -65,7 +65,13 @@ export class SwitchPhase extends BattlePhase {
     globalScene.ui.setMode(Mode.PARTY, this.isModal ? PartyUiMode.FAINT_SWITCH : PartyUiMode.POST_BATTLE_SWITCH, fieldIndex, (slotIndex: integer, option: PartyOption) => {
       if (this.isModal) {
         console.error("Forced Switch Detected")
-        LoggerTools.logActions(globalScene.currentBattle.waveIndex, `Send in ${globalScene.getPlayerParty()[slotIndex].name}`);
+        let waveIndex = globalScene.currentBattle.waveIndex;
+        if (globalScene.currentBattle.enemyParty.length == 0) {
+          // No enemy party means the switch is happening in between waves (post-shop, pre-next-encounter)
+          // Correct the wave index for logging.
+          waveIndex--;
+        }
+        LoggerTools.logActions(waveIndex, `Send in ${globalScene.getPlayerParty()[slotIndex].name}`);
       }
       if (slotIndex >= globalScene.currentBattle.getBattlerCount() && slotIndex < 6) {
         // Remove any pre-existing PostSummonPhase under the same field index.
