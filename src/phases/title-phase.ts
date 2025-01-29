@@ -1065,7 +1065,7 @@ export class TitlePhase extends Phase {
 
       globalScene.executeWithSeedOffset(() => {
         globalScene.currentBattle.waveIndex = w;
-        for (var i = 0; i < 5; i++) {
+        for (var i = 0; i < 4; i++) {
           regenerateModifierPoolThresholds(party, ModifierPoolType.PLAYER, i);
           const typeOptions: ModifierTypeOption[] = getPlayerModifierTypeOptions(Math.min(6, Math.max(3, 3 + Math.floor((w / 10) - 1))), party);
           if (typeOptions.some(t => t.type.id == "ABILITY_CHARM")) {
