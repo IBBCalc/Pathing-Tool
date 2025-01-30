@@ -1793,7 +1793,7 @@ export function logCapture(floor: integer = globalScene.currentBattle.waveIndex,
   var drpd = getDRPD()
   console.log(`Logging successful capture: ${target.name}`)
   var wv: Wave = getWave(drpd, floor)
-  var pkslot = target.partyslot
+  var pkslot = target.fieldPosition - 1
   if (wv.id != -1) {
     wv.pokemon![pkslot].captured = true;
     console.log("--> ", drpd)
@@ -1851,7 +1851,6 @@ export function logPokemon(floor: integer = globalScene.currentBattle.waveIndex,
   var wv: Wave = getWave(drpd, floor)
   var pk: PokeData = exportPokemon(pokemon, encounterRarity)
   pk.source = pokemon
-  pokemon.partyslot = slot;
   if (wv.pokemon == undefined)
     wv.pokemon = []
   if (wv.pokemon[slot] != undefined) {
