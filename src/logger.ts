@@ -1793,7 +1793,7 @@ export function logCapture(floor: integer = globalScene.currentBattle.waveIndex,
   var drpd = getDRPD()
   console.log(`Logging successful capture: ${target.name}`)
   var wv: Wave = getWave(drpd, floor)
-  var pkslot = target.fieldPosition - 1
+  var pkslot = Math.max(0, target.fieldPosition - 1)
   if (wv.id != -1) {
     wv.pokemon![pkslot].captured = true;
     console.log("--> ", drpd)
