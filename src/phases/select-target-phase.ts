@@ -46,7 +46,7 @@ export class SelectTargetPhase extends PokemonPhase {
               if (species.isRegional()) {
                 pokemonName = `${species.getRegion().toString()} ${pokemonName}`
               }
-              LoggerTools.Actions[this.fieldIndex] += ` ${pokemonName}`;
+              LoggerTools.Actions[this.fieldIndex] += ` (on ${pokemonName})`;
               break;
             case 2:
               // Just specify L or R
