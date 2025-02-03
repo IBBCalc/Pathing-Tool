@@ -41,7 +41,12 @@ export class SelectTargetPhase extends PokemonPhase {
             case 0:
             case 1:
               // Specify clearly that you target your own pokemon
-              LoggerTools.Actions[this.fieldIndex] += ` ${fieldSide[this.fieldIndex]}`;
+              const species = fieldSide[this.fieldIndex].species;
+              var pokemonName = species.getName();
+              if (species.isRegional()) {
+                pokemonName = `${species.getRegion().toString()} ${pokemonName}`
+              }
+              LoggerTools.Actions[this.fieldIndex] += ` ${pokemonName}`;
               break;
             case 2:
               // Just specify L or R
