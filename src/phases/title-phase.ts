@@ -812,38 +812,38 @@ export class TitlePhase extends Phase {
 
     var lures = [
       () => {
-        globalScene.RemoveModifiers();
+        globalScene.RemoveLures();
         return "";
       },
       () => {
-        globalScene.RemoveModifiers();
+        globalScene.RemoveLures();
         globalScene.InsertLure();
         return "Lure";
       },
       () => {
-        globalScene.RemoveModifiers();
+        globalScene.RemoveLures();
         globalScene.InsertSuperLure();
         return "Super Lure";
       },
       () => {
-        globalScene.RemoveModifiers();
+        globalScene.RemoveLures();
         globalScene.InsertMaxLure();
         return "Max Lure";
       },
       () => {
-        globalScene.RemoveModifiers();
+        globalScene.RemoveLures();
         globalScene.InsertLure();
         globalScene.InsertSuperLure();
         return "Lure + Super Lure";
       },
       () => {
-        globalScene.RemoveModifiers();
+        globalScene.RemoveLures();
         globalScene.InsertSuperLure();
         globalScene.InsertMaxLure();
         return "Super Lure + Max Lure";
       },
       () => {
-        globalScene.RemoveModifiers();
+        globalScene.RemoveLures();
         globalScene.InsertThreeLures();
         return "All Lures";
       },
@@ -875,24 +875,50 @@ export class TitlePhase extends Phase {
         mu.start = 35;
         mu.end  = 49;
       },
-      // (mu: {start: integer, end: integer, level: integer}) => {
-      //   // Uses party of the save file
-      //   mu.level = 59;
-      //   mu.start = 29;
-      //   mu.end  = 30;
-      // },
     ]
 
-    // var globals = [
-    //   () => globalScene.InsertMegaBracelet(),
-    //   () => globalScene.InsertDynamaxBand(),
-    //   () => globalScene.InsertTeraOrb(),
-    //   () => globalScene.InsertLockCapsule(),
-    // ]
-
-    // globals.forEach(g => {
-    //   globalScene.RemoveModifiers();
-    //   g()
+    var globals = [
+      () => {
+        return "";
+      },
+      // () => {
+      //   globalScene.InsertMegaBracelet();
+      //   return "Mega";
+      // },
+      // () => {
+      //   globalScene.InsertDynamaxBand();
+      //   return "Band";
+      // },
+      // () => {
+      //   globalScene.InsertLockCapsule();
+      //   return "Lock";
+      // },
+      // () => {
+      //   globalScene.InsertMegaBracelet();
+      //   globalScene.InsertDynamaxBand();
+      //   return "Mega + Band";
+      // },
+      // () => {
+      //   globalScene.InsertMegaBracelet();
+      //   globalScene.InsertLockCapsule();
+      //   return "Mega + Lock";
+      // },
+      // () => {
+      //   globalScene.InsertDynamaxBand();
+      //   globalScene.InsertLockCapsule();
+      //   return "Band + Lock";
+      // },
+      // () => {
+      //   globalScene.InsertMegaBracelet();
+      //   globalScene.InsertDynamaxBand();
+      //   globalScene.InsertLockCapsule();
+      //   return "Mega + Band + Lock";
+      // },
+      // () => {
+      //   globalScene.InsertTeraOrb();
+      //   return "Tera";
+      // },
+    ]
 
     this.iterations = [];
 
@@ -905,30 +931,33 @@ export class TitlePhase extends Phase {
     // this.GenerateShop(party, "test", 9, 10);
     // return
 
-    mushroom.forEach(m => {
-      var mu = {
-        start: 0,
-        end: 0,
-        level: 0
-      }
-      m(mu);
+    globals.forEach(g => {
+      globalScene.RemoveModifiers();
+      var rogueItem = g()
+      mushroom.forEach(m => {
+        var mu = {
+          start: 0,
+          end: 0,
+          level: 0
+        }
+        m(mu);
 
-      var partynames = party.map(p => p.name);
-      console.log(mu.level, partynames, party);
+        var partynames = party.map(p => p.name);
+        console.log(rogueItem, mu.level, partynames, party);
 
-      var e = 0;
-      ethers.forEach(ether => {
-        ether(party[0])
+        var e = 0;
+        ethers.forEach(ether => {
+          ether(party[0])
 
-        lures.forEach(lure => {
-          var text = lure();
-          this.IteratePotions(party, 0, 0, 0, 0, 0, 0, e, text, mu.start, mu.end, mu.level);
+          lures.forEach(lure => {
+            var text = lure();
+            this.IteratePotions(party, 0, 0, 0, 0, 0, 0, e, text, mu.start, mu.end, mu.level, rogueItem);
+          });
+
+          e++;
         });
-
-        e++;
-      })
-    })
-    // });
+      });
+    });
 
     console.log(this.charmList);
     globalScene.ui.showText("DONE! Copy the list from the console and refresh the page.", null);
@@ -973,6 +1002,9 @@ export class TitlePhase extends Phase {
   //  Memory Mushroom
   //  Revive
   //  Max Revive
+  //  Lock Capsule
+  //  Dynamax Band
+  //  Mega Bracelet
   //
   // Planned:
   //  Full Heal
@@ -984,10 +1016,7 @@ export class TitlePhase extends Phase {
   //  Toxic Orb
   //  Flame Orb
   //  Tera Orb
-  //  Lock Capsule
-  //  Dynamax Band
-  //  Mega Bracelet
-  CreateLog(pot = 0, suppot = 0, hyppot = 0, maxpot = 0, revive = 0, eth = 0, lure = "", level = 79) {
+  CreateLog(pot = 0, suppot = 0, hyppot = 0, maxpot = 0, revive = 0, eth = 0, lure = "", level = 79, rogueItem = "") {
     var items: string[] = [];
     if (pot - suppot > 0) items.push(`${pot - suppot}x <87.5% HP and 10+ dmg taken`);
     if (suppot - hyppot > 0) items.push(`${suppot - hyppot}x <75% HP and 25+ dmg taken`);
@@ -996,6 +1025,7 @@ export class TitlePhase extends Phase {
     if (revive > 0) items.push(`${revive}x fainted`);
     if (eth > 0) items.push(`${eth}x low PP`);
     if (lure != "") items.push(`${lure}`);
+    if (rogueItem != "") items.push(`${rogueItem}`);
 
     if (items.length == 0) {
       items.push("nothing");
@@ -1006,13 +1036,13 @@ export class TitlePhase extends Phase {
     return items.join(" + ");
   }
 
-  IteratePotions(party: PlayerPokemon[], n = 0, pot = 0, suppot = 0, hyppot = 0, maxpot = 0, revive = 0, eth = 0, lure = "", start = 1, end = 50, level = 79) {
+  IteratePotions(party: PlayerPokemon[], n = 0, pot = 0, suppot = 0, hyppot = 0, maxpot = 0, revive = 0, eth = 0, lure = "", start = 1, end = 50, level = 79, rogueItem = "") {
     if (n == Math.min(3, party.length)) {
-      var i = `${pot} ${suppot} ${hyppot} ${maxpot} ${revive} ${eth} ${lure} ${level}`;
+      var i = `${pot} ${suppot} ${hyppot} ${maxpot} ${revive} ${eth} ${lure} ${level} ${rogueItem}`;
       if (this.iterations.some(it => it == i)) return;
 
       this.iterations.push(i)
-      var comptext = this.CreateLog(pot, suppot, hyppot, maxpot, revive, eth, lure, level);
+      var comptext = this.CreateLog(pot, suppot, hyppot, maxpot, revive, eth, lure, level, rogueItem);
       this.GenerateShop(party, comptext, start, end);
       return;
     }
@@ -1021,39 +1051,39 @@ export class TitlePhase extends Phase {
     var mhp = pokemon.getMaxHp();
 
     // Nothing
-    this.IteratePotions(party, n + 1, pot, suppot, hyppot, maxpot, revive, eth, lure, start, end, level);
+    this.IteratePotions(party, n + 1, pot, suppot, hyppot, maxpot, revive, eth, lure, start, end, level, rogueItem);
 
     // potion
     var damage = Math.min(Math.max(Math.floor(mhp * 0.18), 10));
     if (damage < mhp) {
       pokemon.hp = mhp - damage;
-      this.IteratePotions(party, n + 1, pot + 1, suppot, hyppot, maxpot, revive, eth, lure, start, end, level);
+      this.IteratePotions(party, n + 1, pot + 1, suppot, hyppot, maxpot, revive, eth, lure, start, end, level, rogueItem);
     }
 
     // super potion
     var damage = Math.min(Math.max(Math.floor(mhp * 0.31), 25));
     if (damage < mhp) {
       pokemon.hp = mhp - damage;
-      this.IteratePotions(party, n + 1, pot + 1, suppot + 1, hyppot, maxpot, revive, eth, lure, start, end, level);
+      this.IteratePotions(party, n + 1, pot + 1, suppot + 1, hyppot, maxpot, revive, eth, lure, start, end, level, rogueItem);
     }
 
     // hyper potion
     var damage = Math.min(Math.max(Math.floor(mhp * 0.45), 100));
     if (damage < mhp && (mhp - damage) / mhp > 0.5) {
       pokemon.hp = mhp - damage;
-      this.IteratePotions(party, n + 1, pot + 1, suppot + 1, hyppot + 1, maxpot, revive, eth, lure, start, end, level);
+      this.IteratePotions(party, n + 1, pot + 1, suppot + 1, hyppot + 1, maxpot, revive, eth, lure, start, end, level, rogueItem);
     }
 
     // max potion
     var damage = Math.min(Math.max(Math.floor(mhp * 0.51), 100));
     if (damage < mhp) {
       pokemon.hp = mhp - damage;
-      this.IteratePotions(party, n + 1, pot + 1, suppot + 1, hyppot + 1, maxpot + 1, revive, eth, lure, start, end, level);
+      this.IteratePotions(party, n + 1, pot + 1, suppot + 1, hyppot + 1, maxpot + 1, revive, eth, lure, start, end, level, rogueItem);
     }
 
     // Revive
     pokemon.hp = 0;
-    this.IteratePotions(party, n + 1, pot + 1, suppot + 1, hyppot + 1, maxpot + 1, revive + 1, eth, lure, start, end, level);
+    this.IteratePotions(party, n + 1, pot + 1, suppot + 1, hyppot + 1, maxpot + 1, revive + 1, eth, lure, start, end, level, rogueItem);
 
     // reset pokemon
     pokemon.hp = pokemon.getMaxHp();

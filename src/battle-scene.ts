@@ -1322,22 +1322,22 @@ export default class BattleScene extends SceneBase {
 
   InsertMegaBracelet() {
     let modifier = modifierTypes.MEGA_BRACELET().withIdFromFunc(modifierTypes.MEGA_BRACELET).newModifier() as MegaEvolutionAccessModifier
-    this.addModifier(modifier , true, false, false, true);
+    this.addModifier(modifier, true, false, false, true);
   }
 
   InsertDynamaxBand() {
     let modifier = modifierTypes.DYNAMAX_BAND().withIdFromFunc(modifierTypes.DYNAMAX_BAND).newModifier() as GigantamaxAccessModifier
-    this.addModifier(modifier , true, false, false, true);
+    this.addModifier(modifier, true, false, false, true);
   }
 
   InsertTeraOrb() {
     let modifier = modifierTypes.TERA_ORB().withIdFromFunc(modifierTypes.TERA_ORB).newModifier() as TerastallizeAccessModifier
-    this.addModifier(modifier , true, false, false, true);
+    this.addModifier(modifier, true, false, false, true);
   }
 
   InsertLockCapsule() {
     let modifier = modifierTypes.LOCK_CAPSULE().withIdFromFunc(modifierTypes.LOCK_CAPSULE).newModifier() as LockModifierTiersModifier
-    this.addModifier(modifier , true, false, false, true);
+    this.addModifier(modifier, true, false, false, true);
   }
 
   RemoveModifiers() {
@@ -1349,6 +1349,13 @@ export default class BattleScene extends SceneBase {
       || m instanceof GigantamaxAccessModifier
       || m instanceof TerastallizeAccessModifier
       || m instanceof LockModifierTiersModifier);
+    mods.forEach(m => {
+      this.removeModifier(m);
+    })
+  }
+
+  RemoveLures() {
+    var mods = this.modifiers.filter(m => m instanceof DoubleBattleChanceBoosterModifier);
     mods.forEach(m => {
       this.removeModifier(m);
     })
