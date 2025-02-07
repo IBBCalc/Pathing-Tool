@@ -6,7 +6,7 @@ import { Command } from "#app/ui/command-ui-handler";
 import MessageUiHandler from "#app/ui/message-ui-handler";
 import { Mode } from "#app/ui/ui";
 import * as Utils from "#app/utils";
-import { PokemonFormChangeItemModifier, PokemonHeldItemModifier, SwitchEffectTransferModifier } from "#app/modifier/modifier";
+import { BerryModifier, PokemonFormChangeItemModifier, PokemonHeldItemModifier, SwitchEffectTransferModifier } from "#app/modifier/modifier";
 import { allMoves, ForceSwitchOutAttr } from "#app/data/move";
 import { getGenderColor, getGenderSymbol } from "#app/data/gender";
 import { StatusEffect } from "#enums/status-effect";
@@ -27,6 +27,7 @@ import type { CommandPhase } from "#app/phases/command-phase";
 import { SelectModifierPhase } from "#app/phases/select-modifier-phase";
 import { globalScene } from "#app/global-scene";
 import * as LoggerTools from "../logger";
+import { BerryType } from "#app/enums/berry-type";
 
 const defaultMessage = i18next.t("partyUiHandler:choosePokemon");
 
@@ -1346,26 +1347,17 @@ class PartySlot extends Phaser.GameObjects.Container {
     this.slotHpText.setOrigin(1, 0);
     this.slotHpText.setVisible(false);
 
-    var hpPercentage = (this.pokemon.hp / this.pokemon.getMaxHp()) * 100;
+    const hpPercentage = (this.pokemon.hp / this.pokemon.getMaxHp()) * 100;
     this.slotHpPercentageText = addTextObject(0, 0, `${hpPercentage.toFixed(2)}%`, TextStyle.PARTY);
     this.slotHpPercentageText.setPositionRelative(this.slotHpBar, this.slotIndex >= battlerCount ? 57 : 35, this.slotHpBar.height - 2);
     this.slotHpPercentageText.setOrigin(1, 0);
     this.slotHpPercentageText.setVisible(false);
 
-    var lowPP = this.pokemon.moveset.some(m => m?.ppUsed && (m.getMovePp() - m.ppUsed) <= 5 && m.ppUsed > Math.floor(m.getMovePp() / 2));
-    this.slotEtherText = addTextObject(0, 0, `${lowPP ? "E" : ""}`, TextStyle.PARTY);
-    this.slotEtherText.setPositionRelative(this.slotHpBar, this.slotIndex >= battlerCount ? 58 : 36, this.slotHpBar.height - 2);
-    this.slotEtherText.setOrigin(0, 0);
-    this.slotEtherText.setVisible(false);
-
-    var hpPercentage = (this.pokemon.hp / this.pokemon.getMaxHp()) * 100;
-    this.slotHpPercentageText = addTextObject(0, 0, `${hpPercentage.toFixed(2)}%`, TextStyle.PARTY);
-    this.slotHpPercentageText.setPositionRelative(this.slotHpBar, this.slotIndex >= battlerCount ? 57 : 35, this.slotHpBar.height - 2);
-    this.slotHpPercentageText.setOrigin(1, 0);
-    this.slotHpPercentageText.setVisible(false);
-
-    var lowPP = this.pokemon.moveset.some(m => m?.ppUsed && (m.getMovePp() - m.ppUsed) <= 5 && m.ppUsed > Math.floor(m.getMovePp() / 2));
-    this.slotEtherText = addTextObject(0, 0, `${lowPP ? "E" : ""}`, TextStyle.PARTY);
+    const fainted = this.pokemon.hp <= 0;
+    const leppa = this.pokemon.getHeldItems().some(m => m instanceof BerryModifier && m.berryType === BerryType.LEPPA);
+    const lowPP = this.pokemon.moveset.some(m => m?.ppUsed && (m.getMovePp() - m.ppUsed) <= 5 && m.ppUsed > Math.floor(m.getMovePp() / 2));
+    const showEther = !fainted && !leppa && lowPP;
+    this.slotEtherText = addTextObject(0, 0, `${showEther ? "E" : ""}`, TextStyle.PARTY);
     this.slotEtherText.setPositionRelative(this.slotHpBar, this.slotIndex >= battlerCount ? 58 : 36, this.slotHpBar.height - 2);
     this.slotEtherText.setOrigin(0, 0);
     this.slotEtherText.setVisible(false);
