@@ -395,12 +395,7 @@ export default class FightUiHandler extends UiHandler implements InfoToggle {
     if (move.getMove().category == MoveData.MoveCategory.STATUS) {
       return ""; // Don't give a damage estimate for status moves
     }
-    //return "";
-    var crit = {
-      canCrit: target.canBeCrit(),
-      alwaysCrit: target.isGuaranteedCrit(user, move.getMove(), true)
-    }
-    //console.log(out)
+
     var dmgHigh = target.getAttackDamage(user, move.getMove(), false, false, target.canBeCrit(), true).damage
     var dmgLow = target.getAttackDamage(user, move.getMove(), false, false, target.isGuaranteedCrit(user, move.getMove(), true), true).damage
     var minHits = 1
@@ -426,20 +421,27 @@ export default class FightUiHandler extends UiHandler implements InfoToggle {
           }, 0);
       }
     }
+
     if (maxHits == -1) {
       maxHits = minHits
     }
-    var h = user.getHeldItems()
-    for (var i = 0; i < h.length; i++) {
-      if (h[i].type instanceof PokemonMultiHitModifierType) {
-        minHits *= h[i].getStackCount()
-        maxHits *= h[i].getStackCount()
+
+    // Add Multi Lens if its not a multi-hit move
+    if (minHits == 1) {
+      var h = user.getHeldItems()
+      for (var i = 0; i < h.length; i++) {
+        if (h[i].type instanceof PokemonMultiHitModifierType) {
+          minHits *= h[i].getStackCount()
+          maxHits *= h[i].getStackCount()
+        }
       }
     }
+
     if (false) {
       dmgLow = dmgLow * minHits
       dmgHigh = dmgHigh * maxHits
     }
+
     var qSuffix = ""
     if (target.isBoss()) {
       var shieldsBrokenLow = (target as EnemyPokemon).calculateBossClearedShields(dmgLow)
@@ -451,6 +453,7 @@ export default class FightUiHandler extends UiHandler implements InfoToggle {
       dmgLow = (target as EnemyPokemon).calculateBossDamage(dmgLow);
       dmgHigh = (target as EnemyPokemon).calculateBossDamage(dmgHigh);
     }
+
     var dmgLowP = Math.round((dmgLow)/target.getMaxHp() * 100)
     var dmgHighP = Math.round((dmgHigh)/target.getMaxHp() * 100)
     var koText = ""
@@ -460,10 +463,12 @@ export default class FightUiHandler extends UiHandler implements InfoToggle {
       var percentChance = Utils.rangemap(target.hp, dmgLow, dmgHigh, 0, 1)
       koText = " " + Math.round(percentChance * 100) + "% KO"
     }
+
     //console.log(target.getMoveEffectiveness(user, move.getMove(), false, true) + "x - " + ((dmgLowP == dmgHighP) ? (dmgLowP + "%" + qSuffix) : (dmgLowP + "%-" + dmgHighP + "%" + qSuffix)) + koText)
     if (target.getMoveEffectiveness(user, move.getMove(), false, true) == undefined) {
       return ""
     }
+
     if (globalScene.damageDisplay == "Percent")
       return (dmgLowP == dmgHighP ? dmgLowP + "%" + qSuffix : dmgLowP + "%-" + dmgHighP + "%" + qSuffix) + koText
     if (globalScene.damageDisplay == "Value")
