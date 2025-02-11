@@ -53,8 +53,8 @@ export function clampInt(value: integer, min: integer, max: integer): integer {
   return Math.min(Math.max(value, min), max);
 }
 
-export function rangemap(value: integer, min: integer, max: integer, outMin: integer, outMax: integer) {
-  return ((value - min) / (max - min)) * (outMax - outMin) + outMin
+export function rangemap(value: integer, min: integer, max: integer) {
+  return (max - value) / (max - min);
 }
 
 export function randGauss(stdev: number, mean: number = 0, reason?: string): number {
