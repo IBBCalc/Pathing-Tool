@@ -12,10 +12,10 @@ import * as LoggerTools from "../logger";
 import { SwitchType } from "#enums/switch-type";
 
 export class CheckSwitchPhase extends BattlePhase {
-  protected fieldIndex: integer;
+  protected fieldIndex: number;
   protected useName: boolean;
 
-  constructor(fieldIndex: integer, useName: boolean) {
+  constructor(fieldIndex: number, useName: boolean) {
     super();
 
     this.fieldIndex = fieldIndex;

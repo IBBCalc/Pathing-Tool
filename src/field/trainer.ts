@@ -33,11 +33,11 @@ export enum TrainerVariant {
 export default class Trainer extends Phaser.GameObjects.Container {
   public config: TrainerConfig;
   public variant: TrainerVariant;
-  public partyTemplateIndex: integer;
+  public partyTemplateIndex: number;
   public name: string;
   public partnerName: string;
 
-  constructor(trainerType: TrainerType, variant: TrainerVariant, partyTemplateIndex?: integer, name?: string, partnerName?: string, trainerConfigOverride?: TrainerConfig) {
+  constructor(trainerType: TrainerType, variant: TrainerVariant, partyTemplateIndex?: number, name?: string, partnerName?: string, trainerConfigOverride?: TrainerConfig) {
     super(globalScene, -72, 80);
     this.config = trainerConfigs.hasOwnProperty(trainerType)
       ? trainerConfigs[trainerType]
@@ -321,7 +321,7 @@ export default class Trainer extends Phaser.GameObjects.Container {
     return this.config.partyTemplates[this.partyTemplateIndex];
   }
 
-  getPartyLevels(waveIndex: integer): integer[] {
+  getPartyLevels(waveIndex: number): number[] {
     const ret: number[] = [];
     const partyTemplate = this.getPartyTemplate();
 
@@ -369,7 +369,7 @@ export default class Trainer extends Phaser.GameObjects.Container {
     return ret;
   }
 
-  genPartyMember(index: integer): EnemyPokemon {
+  genPartyMember(index: number): EnemyPokemon {
     const battle = globalScene.currentBattle;
     const level = battle.enemyLevels?.[index]!; // TODO: is this bang correct?
 
@@ -488,7 +488,7 @@ export default class Trainer extends Phaser.GameObjects.Container {
   }
 
 
-  genNewPartyMemberSpecies(level: integer, strength: PartyMemberStrength, attempt?: integer): PokemonSpecies {
+  genNewPartyMemberSpecies(level: number, strength: PartyMemberStrength, attempt?: number): PokemonSpecies {
     const battle = globalScene.currentBattle;
     const template = this.getPartyTemplate();
 
@@ -569,7 +569,7 @@ export default class Trainer extends Phaser.GameObjects.Container {
     return currentSpecies.includes(baseSpecies) || staticSpecies.includes(baseSpecies);
   }
 
-  getPartyMemberMatchupScores(trainerSlot: TrainerSlot = TrainerSlot.NONE, forSwitch: boolean = false): [integer, integer][] {
+  getPartyMemberMatchupScores(trainerSlot: TrainerSlot = TrainerSlot.NONE, forSwitch: boolean = false): [number, number][] {
     if (trainerSlot && !this.isDouble()) {
       trainerSlot = TrainerSlot.NONE;
     }
@@ -594,12 +594,12 @@ export default class Trainer extends Phaser.GameObjects.Container {
       }
 
       return [ party.indexOf(p), score ];
-    }) as [integer, integer][];
+    }) as [number, number][];
 
     return partyMemberScores;
   }
 
-  getSortedPartyMemberMatchupScores(partyMemberScores: [integer, integer][] = this.getPartyMemberMatchupScores()) {
+  getSortedPartyMemberMatchupScores(partyMemberScores: [number, number][] = this.getPartyMemberMatchupScores()) {
     const sortedPartyMemberScores = partyMemberScores.slice(0);
     sortedPartyMemberScores.sort((a, b) => {
       const scoreA = a[1];
@@ -610,7 +610,7 @@ export default class Trainer extends Phaser.GameObjects.Container {
     return sortedPartyMemberScores;
   }
 
-  getNextSummonIndex(trainerSlot: TrainerSlot = TrainerSlot.NONE, partyMemberScores: [integer, integer][] = this.getPartyMemberMatchupScores(trainerSlot)): integer {
+  getNextSummonIndex(trainerSlot: TrainerSlot = TrainerSlot.NONE, partyMemberScores: [number, number][] = this.getPartyMemberMatchupScores(trainerSlot)): number {
     if (trainerSlot && !this.isDouble()) {
       trainerSlot = TrainerSlot.NONE;
     }
@@ -620,7 +620,7 @@ export default class Trainer extends Phaser.GameObjects.Container {
     const maxScorePartyMemberIndexes = partyMemberScores.filter(pms => pms[1] === sortedPartyMemberScores[0][1]).map(pms => pms[0]);
 
     if (maxScorePartyMemberIndexes.length > 1) {
-      let rand: integer;
+      let rand: number;
       globalScene.executeWithSeedOffset(() => rand = Utils.randSeedInt(maxScorePartyMemberIndexes.length, undefined, "Randomly selecting who to send out next"), globalScene.currentBattle.turn << 2);
       return maxScorePartyMemberIndexes[rand!];
     }
@@ -628,7 +628,7 @@ export default class Trainer extends Phaser.GameObjects.Container {
     return maxScorePartyMemberIndexes[0];
   }
 
-  getPartyMemberModifierChanceMultiplier(index: integer): number {
+  getPartyMemberModifierChanceMultiplier(index: number): number {
     switch (this.getPartyTemplate().getStrength(index)) {
       case PartyMemberStrength.WEAKER:
         return 0.75;
@@ -733,7 +733,7 @@ export default class Trainer extends Phaser.GameObjects.Container {
     return ret;
   }
 
-  tint(color: number, alpha?: number, duration?: integer, ease?: string): void {
+  tint(color: number, alpha?: number, duration?: number, ease?: string): void {
     const tintSprites = this.getTintSprites();
     tintSprites.map(tintSprite => {
       tintSprite.setTintFill(color);
@@ -754,7 +754,7 @@ export default class Trainer extends Phaser.GameObjects.Container {
     });
   }
 
-  untint(duration: integer, ease?: string): void {
+  untint(duration: number, ease?: string): void {
     const tintSprites = this.getTintSprites();
     tintSprites.map(tintSprite => {
       if (duration) {

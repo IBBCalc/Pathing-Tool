@@ -45,6 +45,11 @@ export class Arena {
   public bgm: string;
   public ignoreAbilities: boolean;
   public ignoringEffectSource: BattlerIndex | null;
+  /**
+   * Saves the number of times a party pokemon faints during a arena encounter.
+   * {@linkcode globalScene.currentBattle.enemyFaints} is the corresponding faint counter for the enemy (this resets every wave).
+   */
+  public playerFaints: number;
 
   private lastTimeOfDay: TimeOfDay;
 
@@ -53,12 +58,13 @@ export class Arena {
 
   public readonly eventTarget: EventTarget = new EventTarget();
 
-  constructor(biome: Biome, bgm: string) {
+  constructor(biome: Biome, bgm: string, playerFaints: number = 0) {
     this.biomeType = biome;
     this.tags = [];
     this.bgm = bgm;
     this.trainerPool = biomeTrainerPools[biome];
     this.updatePoolsForTimeOfDay();
+    this.playerFaints = playerFaints;
   }
 
   init() {
@@ -87,7 +93,7 @@ export class Arena {
     }
   }
 
-  randomSpecies(waveIndex: integer, level: integer, attempt?: integer, luckValue?: integer, isBoss?: boolean): PokemonSpecies {
+  randomSpecies(waveIndex: number, level: number, attempt?: number, luckValue?: number, isBoss?: boolean): PokemonSpecies {
     const overrideSpecies = globalScene.gameMode.getOverrideSpecies(waveIndex);
     if (overrideSpecies) {
       return overrideSpecies;
@@ -181,7 +187,7 @@ export class Arena {
     return ret;
   }
 
-  randomTrainerType(waveIndex: integer, isBoss: boolean = false): TrainerType {
+  randomTrainerType(waveIndex: number, isBoss: boolean = false): TrainerType {
     const isTrainerBoss = !!this.trainerPool[BiomePoolTier.BOSS].length
       && (globalScene.gameMode.isTrainerBoss(waveIndex, this.biomeType, globalScene.offsetGym) || isBoss);
     console.log(isBoss, this.trainerPool);
@@ -198,7 +204,7 @@ export class Arena {
     return !tierPool.length ? TrainerType.BREEDER : tierPool[Utils.randSeedInt(tierPool.length, undefined, "Selecting trainer type")];
   }
 
-  getSpeciesFormIndex(species: PokemonSpecies): integer {
+  getSpeciesFormIndex(species: PokemonSpecies): number {
     switch (species.speciesId) {
       case Species.BURMY:
       case Species.WORMADAM:
@@ -386,7 +392,7 @@ export class Arena {
    * Gets the denominator for the chance for a trainer spawn
    * @returns n where 1/n is the chance of a trainer battle
    */
-  getTrainerChance(): integer {
+  getTrainerChance(): number {
     switch (this.biomeType) {
       case Biome.METROPOLIS:
         return 2;
@@ -471,10 +477,10 @@ export class Arena {
     }
   }
 
-  overrideTint(): [integer, integer, integer] {
+  overrideTint(): [number, number, number] {
     switch (Overrides.ARENA_TINT_OVERRIDE) {
       case TimeOfDay.DUSK:
-        return [ 98, 48, 73 ].map(c => Math.round((c + 128) / 2)) as [integer, integer, integer];
+        return [ 98, 48, 73 ].map(c => Math.round((c + 128) / 2)) as [number, number, number];
         break;
       case (TimeOfDay.NIGHT):
         return [ 64, 64, 64 ];
@@ -487,7 +493,7 @@ export class Arena {
     }
   }
 
-  getDayTint(): [integer, integer, integer] {
+  getDayTint(): [number, number, number] {
     if (Overrides.ARENA_TINT_OVERRIDE !== null) {
       return this.overrideTint();
     }
@@ -499,7 +505,7 @@ export class Arena {
     }
   }
 
-  getDuskTint(): [integer, integer, integer] {
+  getDuskTint(): [number, number, number] {
     if (Overrides.ARENA_TINT_OVERRIDE) {
       return this.overrideTint();
     }
@@ -509,11 +515,11 @@ export class Arena {
 
     switch (this.biomeType) {
       default:
-        return [ 98, 48, 73 ].map(c => Math.round((c + 128) / 2)) as [integer, integer, integer];
+        return [ 98, 48, 73 ].map(c => Math.round((c + 128) / 2)) as [number, number, number];
     }
   }
 
-  getNightTint(): [integer, integer, integer] {
+  getNightTint(): [number, number, number] {
     if (Overrides.ARENA_TINT_OVERRIDE) {
       return this.overrideTint();
     }
@@ -666,6 +672,7 @@ export class Arena {
       this.trySetWeather(WeatherType.NONE, false);
     }
     this.trySetTerrain(TerrainType.NONE, false, true);
+    this.resetPlayerFaintCount();
     this.removeAllTags();
   }
 
@@ -673,6 +680,7 @@ export class Arena {
     globalScene.loadBgm(this.bgm);
   }
 
+  /** The loop point of any given biome track, read as seconds and milliseconds. */
   getBgmLoopPoint(): number {
     switch (this.biomeType) {
       case Biome.TOWN:
@@ -743,10 +751,16 @@ export class Arena {
         return 0.000;
       case Biome.SNOWY_FOREST:
         return 3.047;
+      case Biome.END:
+        return 17.153;
       default:
         console.warn(`missing bgm loop-point for biome "${Biome[this.biomeType]}" (=${this.biomeType})`);
         return 0;
     }
+  }
+
+  resetPlayerFaintCount(): void {
+    this.playerFaints = 0;
   }
 }
 
@@ -790,7 +804,7 @@ export function getBiomeHasProps(biomeType: Biome): boolean {
 export class ArenaBase extends Phaser.GameObjects.Container {
   public player: boolean;
   public biome: Biome;
-  public propValue: integer;
+  public propValue: number;
   public base: Phaser.GameObjects.Sprite;
   public props: Phaser.GameObjects.Sprite[];
 
@@ -811,7 +825,7 @@ export class ArenaBase extends Phaser.GameObjects.Container {
       }) : [];
   }
 
-  setBiome(biome: Biome, propValue?: integer): void {
+  setBiome(biome: Biome, propValue?: number): void {
     const hasProps = getBiomeHasProps(biome);
     const biomeKey = getBiomeKey(biome);
     const baseKey = `${biomeKey}_${this.player ? "a" : "b"}`;

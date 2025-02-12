@@ -372,30 +372,36 @@ export class TitlePhase extends Phase {
           this.end();
         };
         const { gameData } = globalScene;
+        const options: OptionSelectItem[] = [];
+        options.push({
+          label: GameMode.getModeName(GameModes.CLASSIC),
+          handler: () => {
+            setModeAndEnd(GameModes.CLASSIC);
+            return true;
+          }
+        });
+        options.push({
+          label: i18next.t("menu:dailyRun"),
+          handler: () => {
+            this.initDailyRun();
+            return true;
+          }
+        });
         if (gameData.isUnlocked(Unlockables.ENDLESS_MODE)) {
-          const options: OptionSelectItem[] = [
-            {
-              label: GameMode.getModeName(GameModes.CLASSIC),
-              handler: () => {
-                setModeAndEnd(GameModes.CLASSIC);
-                return true;
-              }
-            },
-            {
-              label: GameMode.getModeName(GameModes.CHALLENGE),
-              handler: () => {
-                setModeAndEnd(GameModes.CHALLENGE);
-                return true;
-              }
-            },
-            {
-              label: GameMode.getModeName(GameModes.ENDLESS),
-              handler: () => {
-                setModeAndEnd(GameModes.ENDLESS);
-                return true;
-              }
+          options.push({
+            label: GameMode.getModeName(GameModes.CHALLENGE),
+            handler: () => {
+              setModeAndEnd(GameModes.CHALLENGE);
+              return true;
             }
-          ];
+          });
+          options.push({
+            label: GameMode.getModeName(GameModes.ENDLESS),
+            handler: () => {
+              setModeAndEnd(GameModes.ENDLESS);
+              return true;
+            }
+          });
           if (gameData.isUnlocked(Unlockables.SPLICED_ENDLESS_MODE)) {
             options.push({
               label: GameMode.getModeName(GameModes.SPLICED_ENDLESS),
@@ -550,7 +556,7 @@ export class TitlePhase extends Phase {
       label: i18next.t("menu:loadGame"),
       handler: () => {
         globalScene.ui.setOverlayMode(Mode.SAVE_SLOT, SaveSlotUiMode.LOAD,
-          (slotId: integer, autoSlot: integer) => {
+          (slotId: number, autoSlot: integer) => {
             if (slotId === -1) {
               return this.showOptions();
             }
@@ -558,18 +564,16 @@ export class TitlePhase extends Phase {
           });
         return true;
       }
-    });
-    if (false) {
-      options.push({
-        label: i18next.t("menu:dailyRun"),
-        handler: () => {
-          this.setupDaily();
-          return true;
-        },
-        keepOpen: true
-      });
-    }
-    options.push({
+    },
+    {
+      label: i18next.t("menu:runHistory"),
+      handler: () => {
+        globalScene.ui.setOverlayMode(Mode.RUN_HISTORY);
+        return true;
+      },
+      keepOpen: true
+    },
+    {
       label: i18next.t("menu:settings"),
       handler: () => {
         globalScene.ui.setOverlayMode(Mode.SETTINGS);
@@ -585,7 +589,7 @@ export class TitlePhase extends Phase {
     globalScene.ui.setMode(Mode.TITLE, config);
   }
 
-  loadSaveSlot(slotId: integer, autoSlot?: integer): void {
+  loadSaveSlot(slotId: number, autoSlot?: integer): void {
     globalScene.sessionSlotId = slotId > -1 || !loggedInUser ? slotId : loggedInUser.lastSessionSlot;
     globalScene.ui.setMode(Mode.MESSAGE);
     globalScene.ui.resetModeChain();
@@ -603,7 +607,8 @@ export class TitlePhase extends Phase {
   }
 
   initDailyRun(): void {
-    globalScene.ui.setMode(Mode.SAVE_SLOT, SaveSlotUiMode.SAVE, (slotId: integer) => {
+    globalScene.ui.clearText();
+    globalScene.ui.setMode(Mode.SAVE_SLOT, SaveSlotUiMode.SAVE, (slotId: number) => {
       globalScene.clearPhaseQueue();
       if (slotId === -1) {
         globalScene.pushPhase(new TitlePhase());

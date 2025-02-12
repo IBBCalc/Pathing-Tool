@@ -5,11 +5,11 @@ import { FieldPhase } from "./field-phase";
 import * as LoggerTools from "../logger";
 
 export abstract class PokemonPhase extends FieldPhase {
-  protected battlerIndex: BattlerIndex | integer;
+  protected battlerIndex: BattlerIndex | number;
   public player: boolean;
-  public fieldIndex: integer;
+  public fieldIndex: number;
 
-  constructor(battlerIndex?: BattlerIndex | integer) {
+  constructor(battlerIndex?: BattlerIndex | number) {
     super();
 
     if (battlerIndex === undefined) {
