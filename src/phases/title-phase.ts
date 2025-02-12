@@ -22,20 +22,20 @@ import { SelectStarterPhase } from "./select-starter-phase";
 import { SummonPhase } from "./summon-phase";
 import { globalScene } from "#app/global-scene";
 import * as LoggerTools from "../logger";
-import { Biome } from "#app/enums/biome.js";
-import { GameDataType } from "#app/enums/game-data-type.js";
-import { Species } from "#app/enums/species.js";
-import { getPokemonNameWithAffix } from "#app/messages.js";
-import { Nature } from "#app/enums/nature.js";
-import { biomeLinks } from "#app/data/balance/biomes.js";
-import { applyAbAttrs, SyncEncounterNatureAbAttr } from "#app/data/ability.js";
-import { TrainerSlot } from "#app/data/trainer-config.js";
-import { BattleSpec } from "#app/enums/battle-spec.js";
-import { Moves } from "#app/enums/moves.js";
-import { Type } from "#app/enums/type.js";
-import { allSpecies } from "#app/data/pokemon-species.js";
-import { PlayerPokemon } from "#app/field/pokemon.js";
-import overrides from "#app/overrides.js";
+import { Biome } from "#app/enums/biome";
+import { GameDataType } from "#app/enums/game-data-type";
+import { Species } from "#app/enums/species";
+import { getPokemonNameWithAffix } from "#app/messages";
+import { Nature } from "#app/enums/nature";
+import { biomeLinks } from "#app/data/balance/biomes";
+import { applyAbAttrs, SyncEncounterNatureAbAttr } from "#app/data/ability";
+import { TrainerSlot } from "#app/data/trainer-config";
+import { BattleSpec } from "#app/enums/battle-spec";
+import { Moves } from "#app/enums/moves";
+import { Type } from "#app/enums/type";
+import { allSpecies } from "#app/data/pokemon-species";
+import { PlayerPokemon } from "#app/field/pokemon";
+import overrides from "#app/overrides";
 
 
 export class TitlePhase extends Phase {
