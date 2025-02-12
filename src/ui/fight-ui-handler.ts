@@ -21,7 +21,7 @@ import { BattleType } from "#app/battle";
 export default class FightUiHandler extends UiHandler implements InfoToggle {
   public static readonly MOVES_CONTAINER_NAME = "moves";
 
-  private readonly logDamagePrediction: Boolean = true;
+  private readonly logDamagePrediction: Boolean = false;
 
   private movesContainer: Phaser.GameObjects.Container;
   private moveInfoContainer: Phaser.GameObjects.Container;
