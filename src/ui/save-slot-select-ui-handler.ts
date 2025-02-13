@@ -11,7 +11,7 @@ import { Mode } from "./ui";
 import { addWindow } from "./ui-theme";
 import { allpanels, biomePanelIDs } from "../loading-scene"
 import { RunDisplayMode } from "#app/ui/run-info-ui-handler";
-import { getBiomeName } from "#app/data/balance/biomes.js";
+import { getBiomeName } from "#app/data/balance/biomes";
 import * as Modifier from "../modifier/modifier";
 
 const SESSION_SLOTS_COUNT = 5;

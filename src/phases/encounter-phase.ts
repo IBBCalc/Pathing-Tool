@@ -39,7 +39,7 @@ import { overrideHeldItems, overrideModifiers } from "#app/modifier/modifier";
 import i18next from "i18next";
 import { WEIGHT_INCREMENT_ON_SPAWN_MISS } from "#app/data/mystery-encounters/mystery-encounters";
 import * as LoggerTools from "../logger";
-import { GameModes } from "#app/game-mode.js";
+import { GameModes } from "#app/game-mode";
 
 export class EncounterPhase extends BattlePhase {
   private loaded: boolean;

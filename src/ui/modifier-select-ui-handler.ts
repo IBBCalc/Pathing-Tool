@@ -13,7 +13,7 @@ import { allMoves } from "../data/move";
 import * as Utils from "./../utils";
 import Overrides from "#app/overrides";
 import i18next from "i18next";
-import { GameModes } from "#app/game-mode.js";
+import { GameModes } from "#app/game-mode";
 import { ShopCursorTarget } from "#app/enums/shop-cursor-target";
 import { IntegerHolder } from "./../utils";
 import Phaser from "phaser";

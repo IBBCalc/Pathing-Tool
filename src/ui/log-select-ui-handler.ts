@@ -8,9 +8,9 @@ import { TextStyle, addTextObject } from "./text";
 import { Mode } from "./ui";
 import { addWindow } from "./ui-theme";
 import * as LoggerTools from "../logger"
-import { Species } from "#app/enums/species.js";
-import { allSpecies, getPokemonSpecies } from "#app/data/pokemon-species.js";
-import { globalScene } from "#app/global-scene.js";
+import { Species } from "#app/enums/species";
+import { allSpecies, getPokemonSpecies } from "#app/data/pokemon-species";
+import { globalScene } from "#app/global-scene";
 
 const sessionSlotCount = 5;
 const gap = 20;

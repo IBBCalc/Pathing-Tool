@@ -5,7 +5,7 @@ import { Mode } from "./ui";
 import i18next from "i18next";
 import * as LoggerTools from "../logger";
 import { addTextObject, TextStyle } from "./text";
-import { globalScene } from "#app/global-scene.js";
+import { globalScene } from "#app/global-scene";
 
 export default class LogNameFormUiHandler extends FormModalUiHandler {
   name: string;

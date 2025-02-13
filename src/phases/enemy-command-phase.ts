@@ -5,7 +5,7 @@ import { FieldPhase } from "./field-phase";
 import * as LoggerTools from "../logger";
 import { Abilities } from "#enums/abilities";
 import { BattlerTagType } from "#enums/battler-tag-type";
-import { PokemonMove } from "#app/field/pokemon.js";
+import { PokemonMove } from "#app/field/pokemon";
 
 /**
  * Phase for determining an enemy AI's action for the next turn.
