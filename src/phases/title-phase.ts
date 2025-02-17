@@ -34,7 +34,7 @@ import { BattleSpec } from "#app/enums/battle-spec";
 import { Moves } from "#app/enums/moves";
 import { Type } from "#app/enums/type";
 import { allSpecies } from "#app/data/pokemon-species";
-import { PlayerPokemon } from "#app/field/pokemon";
+import { PlayerPokemon, PokemonMove } from "#app/field/pokemon";
 import overrides from "#app/overrides";
 
 
@@ -858,7 +858,6 @@ export class TitlePhase extends Phase {
     var mushroom = [
       (mu: {start: integer, end: integer, level: integer}) => {
         this.ClearParty(party);
-        overrides.MOVESET_OVERRIDE = [Moves.TACKLE, Moves.SPLASH, Moves.SPLASH, Moves.SPLASH];
         mu.level = 39;
         this.FillParty(party, comp, mu.level);
         mu.start = 1;
@@ -866,7 +865,6 @@ export class TitlePhase extends Phase {
       },
       (mu: {start: integer, end: integer, level: integer}) => {
         this.ClearParty(party);
-        overrides.MOVESET_OVERRIDE = [Moves.TACKLE, Moves.SPLASH, Moves.SPLASH, Moves.SPLASH];
         mu.level = 59;
         this.FillParty(party, comp, mu.level);
         mu.start = 15;
@@ -874,7 +872,6 @@ export class TitlePhase extends Phase {
       },
       (mu: {start: integer, end: integer, level: integer}) => {
         this.ClearParty(party);
-        overrides.MOVESET_OVERRIDE = [Moves.TACKLE, Moves.SPLASH, Moves.SPLASH, Moves.SPLASH];
         mu.level = 79;
         this.FillParty(party, comp, mu.level);
         mu.start = 35;
@@ -983,7 +980,9 @@ export class TitlePhase extends Phase {
 
   AddPokemon(party: PlayerPokemon[], species: Species, level: integer) {
     var pokemon = allSpecies.filter(sp => sp.speciesId == species)[0];
-    party.push(globalScene.addPlayerPokemon(pokemon, level));
+    var playerPokemon = globalScene.addPlayerPokemon(pokemon, level);
+    playerPokemon.moveset = [new PokemonMove(Moves.TACKLE), new PokemonMove(Moves.SPLASH), new PokemonMove(Moves.SPLASH), new PokemonMove(Moves.SPLASH)]
+    party.push(playerPokemon);
   }
 
   SetFullPP(pokemon: PlayerPokemon) {
