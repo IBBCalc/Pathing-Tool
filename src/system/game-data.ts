@@ -56,6 +56,7 @@ import { MysteryEncounterSaveData } from "#app/data/mystery-encounters/mystery-e
 import type { MysteryEncounterType } from "#enums/mystery-encounter-type";
 import { pokerogueApi } from "#app/plugins/api/pokerogue-api";
 import { ArenaTrapTag } from "#app/data/arena-tag";
+import type { Type } from "#enums/type";
 import { Abilities } from "#app/enums/abilities";
 
 export const defaultStarterSpecies: Species[] = [
@@ -234,6 +235,7 @@ export interface StarterAttributes {
   shiny?: boolean;
   favorite?: boolean;
   nickname?: string;
+  tera?: Type;
 }
 
 export interface StarterPreferences {
