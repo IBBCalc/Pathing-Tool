@@ -6,7 +6,7 @@ import importX from 'eslint-plugin-import-x';
 export default [ 
     {
         name: "eslint-config",
-        files: ["src/**/*.{ts,tsx,js,jsx}"],
+        files: ["src/**/*.{ts,tsx,js,jsx}", "test/**/*.{ts,tsx,js,jsx}"],
         ignores: ["dist/*", "build/*", "coverage/*", "public/*", ".github/*", "node_modules/*", ".vscode/*"],
         languageOptions: {
             parser: parser
@@ -49,7 +49,7 @@ export default [
     },
     {
         name: "eslint-tests",
-        files: ["src/test/**/**.test.ts"],
+        files: ["test/**/**.test.ts"],
         languageOptions: {
             parser: parser,
             parserOptions: {
