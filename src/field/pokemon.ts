@@ -4687,6 +4687,7 @@ export class PlayerPokemon extends Pokemon {
         newPokemon.fusionLuck = this.fusionLuck;
         newPokemon.fusionTeraType = this.fusionTeraType;
         newPokemon.usedTMs = this.usedTMs;
+        newPokemon.evoCounter = this.evoCounter;
 
         globalScene.getPlayerParty().push(newPokemon);
         newPokemon.evolve((!isFusion ? newEvolution : new FusionSpeciesFormEvolution(this.id, newEvolution)), evoSpecies);
@@ -4755,6 +4756,7 @@ export class PlayerPokemon extends Pokemon {
     this.fusionGender = pokemon.gender;
     this.fusionLuck = pokemon.luck;
     this.fusionCustomPokemonData = pokemon.customPokemonData;
+    this.evoCounter = Math.max(pokemon.evoCounter, this.evoCounter);
     if (pokemon.pauseEvolutions || this.pauseEvolutions) {
       this.pauseEvolutions = true;
     }
