@@ -13,13 +13,13 @@ import TimeOfDayWidget from "./time-of-day-widget";
 import * as Utils from "../utils";
 import type {ParseKeys} from "i18next";
 import i18next from "i18next";
-import { getNatureDecrease, getNatureIncrease, getNatureName } from "#app/data/nature.js";
+import { getNatureDecrease, getNatureIncrease, getNatureName } from "#app/data/nature";
 import * as LoggerTools from "../logger";
-import { Gender } from "#app/data/gender.js";
-import { getLuckString } from "#app/modifier/modifier-type.js";
-import { Species } from "#app/enums/species.js";
-import { Region } from "#app/data/pokemon-species.js";
-import { getBiomeName } from "#app/data/balance/biomes.js";
+import { Gender } from "#app/data/gender";
+import { getLuckString } from "#app/modifier/modifier-type";
+import { Species } from "#app/enums/species";
+import { Region } from "#app/data/pokemon-species";
+import { getBiomeName } from "#app/data/balance/biomes";
 
 /** Enum used to differentiate {@linkcode Arena} effects */
 enum ArenaEffectType {

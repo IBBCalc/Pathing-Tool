@@ -5,7 +5,7 @@ import { globalScene } from "#app/global-scene";
 import * as LoggerTools from "../logger";
 
 export class SummonMissingPhase extends SummonPhase {
-  constructor(fieldIndex: integer) {
+  constructor(fieldIndex: number) {
     super(fieldIndex);
   }
 

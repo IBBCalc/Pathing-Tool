@@ -5,7 +5,7 @@ import { SwitchSummonPhase } from "./switch-summon-phase";
 import * as LoggerTools from "../logger";
 
 export class ReturnPhase extends SwitchSummonPhase {
-  constructor(fieldIndex: integer) {
+  constructor(fieldIndex: number) {
     super(SwitchType.SWITCH, fieldIndex, -1, true);
   }
 

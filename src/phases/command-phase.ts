@@ -30,9 +30,9 @@ import { ArenaTagType } from "#app/enums/arena-tag-type";
  */
 
 export class CommandPhase extends FieldPhase {
-  protected fieldIndex: integer;
+  protected fieldIndex: number;
 
-  constructor(fieldIndex: integer) {
+  constructor(fieldIndex: number) {
     super();
 
     this.fieldIndex = fieldIndex;
@@ -128,7 +128,7 @@ export class CommandPhase extends FieldPhase {
     }
   }
 
-  handleCommand(command: Command, logCommand: boolean = true, cursor: integer, ...args: any[]): boolean {
+  handleCommand(command: Command, logCommand: boolean = true, cursor: number, ...args: any[]): boolean {
     const playerPokemon = globalScene.getPlayerField()[this.fieldIndex];
     let success: boolean = false;
 
@@ -349,7 +349,7 @@ export class CommandPhase extends FieldPhase {
     }
   }
 
-  getFieldIndex(): integer {
+  getFieldIndex(): number {
     return this.fieldIndex;
   }
 

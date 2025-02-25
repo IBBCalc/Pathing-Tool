@@ -22,20 +22,20 @@ import { SelectStarterPhase } from "./select-starter-phase";
 import { SummonPhase } from "./summon-phase";
 import { globalScene } from "#app/global-scene";
 import * as LoggerTools from "../logger";
-import { Biome } from "#app/enums/biome.js";
-import { GameDataType } from "#app/enums/game-data-type.js";
-import { Species } from "#app/enums/species.js";
-import { getPokemonNameWithAffix } from "#app/messages.js";
-import { Nature } from "#app/enums/nature.js";
-import { biomeLinks } from "#app/data/balance/biomes.js";
-import { applyAbAttrs, SyncEncounterNatureAbAttr } from "#app/data/ability.js";
-import { TrainerSlot } from "#app/data/trainer-config.js";
-import { BattleSpec } from "#app/enums/battle-spec.js";
-import { Moves } from "#app/enums/moves.js";
-import { Type } from "#app/enums/type.js";
-import { allSpecies } from "#app/data/pokemon-species.js";
-import { PlayerPokemon } from "#app/field/pokemon.js";
-import overrides from "#app/overrides.js";
+import { Biome } from "#app/enums/biome";
+import { GameDataType } from "#app/enums/game-data-type";
+import { Species } from "#app/enums/species";
+import { getPokemonNameWithAffix } from "#app/messages";
+import { Nature } from "#app/enums/nature";
+import { biomeLinks } from "#app/data/balance/biomes";
+import { applyAbAttrs, SyncEncounterNatureAbAttr } from "#app/data/ability";
+import { TrainerSlot } from "#app/data/trainer-config";
+import { BattleSpec } from "#app/enums/battle-spec";
+import { Moves } from "#app/enums/moves";
+import { Type } from "#app/enums/type";
+import { allSpecies } from "#app/data/pokemon-species";
+import { PlayerPokemon, PokemonMove } from "#app/field/pokemon";
+import overrides from "#app/overrides";
 
 
 export class TitlePhase extends Phase {
@@ -372,30 +372,36 @@ export class TitlePhase extends Phase {
           this.end();
         };
         const { gameData } = globalScene;
+        const options: OptionSelectItem[] = [];
+        options.push({
+          label: GameMode.getModeName(GameModes.CLASSIC),
+          handler: () => {
+            setModeAndEnd(GameModes.CLASSIC);
+            return true;
+          }
+        });
+        options.push({
+          label: i18next.t("menu:dailyRun"),
+          handler: () => {
+            this.initDailyRun();
+            return true;
+          }
+        });
         if (gameData.isUnlocked(Unlockables.ENDLESS_MODE)) {
-          const options: OptionSelectItem[] = [
-            {
-              label: GameMode.getModeName(GameModes.CLASSIC),
-              handler: () => {
-                setModeAndEnd(GameModes.CLASSIC);
-                return true;
-              }
-            },
-            {
-              label: GameMode.getModeName(GameModes.CHALLENGE),
-              handler: () => {
-                setModeAndEnd(GameModes.CHALLENGE);
-                return true;
-              }
-            },
-            {
-              label: GameMode.getModeName(GameModes.ENDLESS),
-              handler: () => {
-                setModeAndEnd(GameModes.ENDLESS);
-                return true;
-              }
+          options.push({
+            label: GameMode.getModeName(GameModes.CHALLENGE),
+            handler: () => {
+              setModeAndEnd(GameModes.CHALLENGE);
+              return true;
             }
-          ];
+          });
+          options.push({
+            label: GameMode.getModeName(GameModes.ENDLESS),
+            handler: () => {
+              setModeAndEnd(GameModes.ENDLESS);
+              return true;
+            }
+          });
           if (gameData.isUnlocked(Unlockables.SPLICED_ENDLESS_MODE)) {
             options.push({
               label: GameMode.getModeName(GameModes.SPLICED_ENDLESS),
@@ -550,7 +556,7 @@ export class TitlePhase extends Phase {
       label: i18next.t("menu:loadGame"),
       handler: () => {
         globalScene.ui.setOverlayMode(Mode.SAVE_SLOT, SaveSlotUiMode.LOAD,
-          (slotId: integer, autoSlot: integer) => {
+          (slotId: number, autoSlot: integer) => {
             if (slotId === -1) {
               return this.showOptions();
             }
@@ -558,18 +564,16 @@ export class TitlePhase extends Phase {
           });
         return true;
       }
-    });
-    if (false) {
-      options.push({
-        label: i18next.t("menu:dailyRun"),
-        handler: () => {
-          this.setupDaily();
-          return true;
-        },
-        keepOpen: true
-      });
-    }
-    options.push({
+    },
+    {
+      label: i18next.t("menu:runHistory"),
+      handler: () => {
+        globalScene.ui.setOverlayMode(Mode.RUN_HISTORY);
+        return true;
+      },
+      keepOpen: true
+    },
+    {
       label: i18next.t("menu:settings"),
       handler: () => {
         globalScene.ui.setOverlayMode(Mode.SETTINGS);
@@ -585,7 +589,7 @@ export class TitlePhase extends Phase {
     globalScene.ui.setMode(Mode.TITLE, config);
   }
 
-  loadSaveSlot(slotId: integer, autoSlot?: integer): void {
+  loadSaveSlot(slotId: number, autoSlot?: integer): void {
     globalScene.sessionSlotId = slotId > -1 || !loggedInUser ? slotId : loggedInUser.lastSessionSlot;
     globalScene.ui.setMode(Mode.MESSAGE);
     globalScene.ui.resetModeChain();
@@ -603,7 +607,8 @@ export class TitlePhase extends Phase {
   }
 
   initDailyRun(): void {
-    globalScene.ui.setMode(Mode.SAVE_SLOT, SaveSlotUiMode.SAVE, (slotId: integer) => {
+    globalScene.ui.clearText();
+    globalScene.ui.setMode(Mode.SAVE_SLOT, SaveSlotUiMode.SAVE, (slotId: number) => {
       globalScene.clearPhaseQueue();
       if (slotId === -1) {
         globalScene.pushPhase(new TitlePhase());
@@ -853,7 +858,6 @@ export class TitlePhase extends Phase {
     var mushroom = [
       (mu: {start: integer, end: integer, level: integer}) => {
         this.ClearParty(party);
-        overrides.MOVESET_OVERRIDE = [Moves.TACKLE, Moves.SPLASH, Moves.SPLASH, Moves.SPLASH];
         mu.level = 39;
         this.FillParty(party, comp, mu.level);
         mu.start = 1;
@@ -861,7 +865,6 @@ export class TitlePhase extends Phase {
       },
       (mu: {start: integer, end: integer, level: integer}) => {
         this.ClearParty(party);
-        overrides.MOVESET_OVERRIDE = [Moves.TACKLE, Moves.SPLASH, Moves.SPLASH, Moves.SPLASH];
         mu.level = 59;
         this.FillParty(party, comp, mu.level);
         mu.start = 15;
@@ -869,7 +872,6 @@ export class TitlePhase extends Phase {
       },
       (mu: {start: integer, end: integer, level: integer}) => {
         this.ClearParty(party);
-        overrides.MOVESET_OVERRIDE = [Moves.TACKLE, Moves.SPLASH, Moves.SPLASH, Moves.SPLASH];
         mu.level = 79;
         this.FillParty(party, comp, mu.level);
         mu.start = 35;
@@ -978,7 +980,9 @@ export class TitlePhase extends Phase {
 
   AddPokemon(party: PlayerPokemon[], species: Species, level: integer) {
     var pokemon = allSpecies.filter(sp => sp.speciesId == species)[0];
-    party.push(globalScene.addPlayerPokemon(pokemon, level));
+    var playerPokemon = globalScene.addPlayerPokemon(pokemon, level);
+    playerPokemon.moveset = [new PokemonMove(Moves.TACKLE), new PokemonMove(Moves.SPLASH), new PokemonMove(Moves.SPLASH), new PokemonMove(Moves.SPLASH)]
+    party.push(playerPokemon);
   }
 
   SetFullPP(pokemon: PlayerPokemon) {

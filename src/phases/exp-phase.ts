@@ -10,7 +10,7 @@ import * as LoggerTools from "../logger";
 export class ExpPhase extends PlayerPartyMemberPokemonPhase {
   private expValue: number;
 
-  constructor(partyMemberIndex: integer, expValue: number) {
+  constructor(partyMemberIndex: number, expValue: number) {
     super(partyMemberIndex);
 
     this.expValue = expValue;

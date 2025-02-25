@@ -17,7 +17,7 @@ import type { CustomModifierSettings } from "#app/modifier/modifier-type";
 import { isNullOrUndefined, NumberHolder } from "#app/utils";
 
 export class SelectModifierPhase extends BattlePhase {
-  private rerollCount: integer;
+  private rerollCount: number;
   private modifierTiers?: ModifierTier[];
   private customModifierSettings?: CustomModifierSettings;
   private isCopy: boolean;
@@ -28,7 +28,7 @@ export class SelectModifierPhase extends BattlePhase {
   private predictionCost: integer = 0;
   private costTiers: integer[] = [];
 
-  constructor(rerollCount: integer = 0, modifierTiers?: ModifierTier[], customModifierSettings?: CustomModifierSettings, isCopy: boolean = false, modifierPredictions?: ModifierTypeOption[][], predictionCost: integer = 0) {
+  constructor(rerollCount: number = 0, modifierTiers?: ModifierTier[], customModifierSettings?: CustomModifierSettings, isCopy: boolean = false, modifierPredictions?: ModifierTypeOption[][], predictionCost: integer = 0) {
     super();
 
     this.rerollCount = rerollCount;
@@ -152,7 +152,7 @@ export class SelectModifierPhase extends BattlePhase {
       }
     }
 
-    const modifierSelectCallback = (rowCursor: integer, cursor: integer) => {
+    const modifierSelectCallback = (rowCursor: number, cursor: number) => {
       if (rowCursor < 0 || cursor < 0) {
         globalScene.ui.showText(i18next.t("battle:skipItemQuestion"), null, () => {
           globalScene.ui.setOverlayMode(Mode.CONFIRM, () => {
@@ -165,7 +165,7 @@ export class SelectModifierPhase extends BattlePhase {
         return false;
       }
       let modifierType: ModifierType;
-      let cost: integer;
+      let cost: number;
       const rerollCost = this.getRerollCost(globalScene.lockModifierTiers);
       switch (rowCursor) {
         case 0:
@@ -188,7 +188,7 @@ export class SelectModifierPhase extends BattlePhase {
               }
               break;
             case 1:
-              globalScene.ui.setModeWithoutClear(Mode.PARTY, PartyUiMode.MODIFIER_TRANSFER, -1, (fromSlotIndex: integer, itemIndex: integer, itemQuantity: integer, toSlotIndex: integer, isAll: boolean) => {
+              globalScene.ui.setModeWithoutClear(Mode.PARTY, PartyUiMode.MODIFIER_TRANSFER, -1, (fromSlotIndex: number, itemIndex: number, itemQuantity: number, toSlotIndex: number, isAll: boolean) => {
                 if (toSlotIndex !== undefined && fromSlotIndex < 6 && toSlotIndex < 6 && fromSlotIndex !== toSlotIndex && itemIndex > -1) {
                   const itemModifiers = globalScene.findModifiers(m => m instanceof PokemonHeldItemModifier
                       && m.isTransferable && m.pokemonId === party[fromSlotIndex].id) as PokemonHeldItemModifier[];
@@ -298,7 +298,7 @@ export class SelectModifierPhase extends BattlePhase {
       const rerollText = (this.rerollCount > 0 ? (this.rerollCount > 1 ? `Reroll x${this.rerollCount} > ` : "Reroll > ") : "");
       if (modifierType! instanceof PokemonModifierType) { //TODO: is the bang correct?
         if (modifierType instanceof FusePokemonModifierType) {
-          globalScene.ui.setModeWithoutClear(Mode.PARTY, PartyUiMode.SPLICE, -1, (fromSlotIndex: integer, spliceSlotIndex: integer) => {
+          globalScene.ui.setModeWithoutClear(Mode.PARTY, PartyUiMode.SPLICE, -1, (fromSlotIndex: number, spliceSlotIndex: number) => {
             if (spliceSlotIndex !== undefined && fromSlotIndex < 6 && spliceSlotIndex < 6 && fromSlotIndex !== spliceSlotIndex) {
               LoggerTools.logShop(globalScene.currentBattle.waveIndex, rerollText + modifierType.name + " → " + globalScene.getPlayerParty()[fromSlotIndex].name + " + " + globalScene.getPlayerParty()[spliceSlotIndex].name);
               globalScene.ui.setMode(Mode.MODIFIER_SELECT, this.isPlayer()).then(() => {
@@ -322,13 +322,13 @@ export class SelectModifierPhase extends BattlePhase {
           const tmMoveId = isTmModifier
             ? (modifierType as TmModifierType).moveId
             : undefined;
-          globalScene.ui.setModeWithoutClear(Mode.PARTY, partyUiMode, -1, (slotIndex: integer, option: PartyOption) => {
+          globalScene.ui.setModeWithoutClear(Mode.PARTY, partyUiMode, -1, (slotIndex: number, option: PartyOption) => {
             if (slotIndex < 6) {
               globalScene.ui.setMode(Mode.MODIFIER_SELECT, this.isPlayer()).then(() => {
                 const modifier = !isMoveModifier
                   ? !isRememberMoveModifier
                     ? modifierType.newModifier(party[slotIndex])
-                    : modifierType.newModifier(party[slotIndex], option as integer)
+                    : modifierType.newModifier(party[slotIndex], option as number)
                   : modifierType.newModifier(party[slotIndex], option - PartyOption.MOVE_1);
                 if (isPpRestoreModifier) {
                   LoggerTools.logShop(globalScene.currentBattle.waveIndex, rerollText + modifierType.name + " > " + globalScene.getPlayerParty()[slotIndex].name + " > " + globalScene.getPlayerParty()[slotIndex].moveset[option - PartyOption.MOVE_1]!.getName());
@@ -400,7 +400,7 @@ export class SelectModifierPhase extends BattlePhase {
     return ModifierPoolType.PLAYER;
   }
 
-  getModifierTypeOptions(modifierCount: integer): ModifierTypeOption[] {
+  getModifierTypeOptions(modifierCount: number): ModifierTypeOption[] {
     return getPlayerModifierTypeOptions(modifierCount, globalScene.getPlayerParty(), globalScene.lockModifierTiers ? this.modifierTiers : undefined, this.customModifierSettings);
   }
 
