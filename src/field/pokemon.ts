@@ -1513,8 +1513,8 @@ export default abstract class Pokemon extends Phaser.GameObjects.Container {
    * Suppresses an ability and calls its onlose attributes
    */
   public suppressAbility() {
-    this.summonData.abilitySuppressed = true;
     [ true, false ].forEach((passive) => applyOnLoseAbAttrs(this, passive));
+    this.summonData.abilitySuppressed = true;
   }
 
   /**
@@ -1575,7 +1575,7 @@ export default abstract class Pokemon extends Phaser.GameObjects.Container {
       return false;
     }
     const suppressAbilitiesTag = arena.getTag(ArenaTagType.NEUTRALIZING_GAS) as SuppressAbilitiesTag;
-    if (this.isOnField() && suppressAbilitiesTag) {
+    if (this.isOnField() && suppressAbilitiesTag && !suppressAbilitiesTag.isBeingRemoved()) {
       const thisAbilitySuppressing = ability.hasAttr(PreLeaveFieldRemoveSuppressAbilitiesSourceAbAttr);
       const hasSuppressingAbility = this.hasAbilityWithAttr(PreLeaveFieldRemoveSuppressAbilitiesSourceAbAttr, false);
       // Neutralizing gas is up - suppress abilities unless they are unsuppressable or this pokemon is responsible for the gas
