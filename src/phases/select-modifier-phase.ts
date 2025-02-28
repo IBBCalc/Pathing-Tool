@@ -46,7 +46,7 @@ export class SelectModifierPhase extends BattlePhase {
     console.log("  Reroll Prediction: " + rerollOverride)
     const party = globalScene.getPlayerParty();
     regenerateModifierPoolThresholds(party, this.getPoolType(), rerollOverride);
-    const modifierCount = new Utils.IntegerHolder(3);
+    const modifierCount = new Utils.NumberHolder(3);
     if (this.isPlayer()) {
       globalScene.applyModifiers(ExtraModifierModifier, true, modifierCount);
     }
@@ -193,17 +193,15 @@ export class SelectModifierPhase extends BattlePhase {
                   const itemModifiers = globalScene.findModifiers(m => m instanceof PokemonHeldItemModifier
                       && m.isTransferable && m.pokemonId === party[fromSlotIndex].id) as PokemonHeldItemModifier[];
                   const itemModifier = itemModifiers[itemIndex];
-                  globalScene.tryTransferHeldItemModifier(itemModifier, party[toSlotIndex], true, itemQuantity, undefined, undefined, false)
-                    .then(succeed => {
-                      if (!LoggerTools.isTransferAll.value && succeed) {
-                        if (isAll) {
-                          LoggerTools.logActions(globalScene.currentBattle.waveIndex, `** Transfer ALL | ${party[fromSlotIndex].name} > ${party[toSlotIndex].name} **`)
-                          LoggerTools.isTransferAll.value = true
-                        } else {
-                          LoggerTools.logActions(globalScene.currentBattle.waveIndex, `** Transfer ${itemQuantity > 1 ? itemQuantity + " " : ""}${itemModifier.type.name} | ${party[fromSlotIndex].name} > ${party[toSlotIndex].name} **`)
-                        }
-                      }
-                    });
+                  let success = globalScene.tryTransferHeldItemModifier(itemModifier, party[toSlotIndex], true, itemQuantity, undefined, undefined, false);
+                  if (!LoggerTools.isTransferAll.value && success) {
+                    if (isAll) {
+                      LoggerTools.logActions(globalScene.currentBattle.waveIndex, `** Transfer ALL | ${party[fromSlotIndex].name} > ${party[toSlotIndex].name} **`)
+                      LoggerTools.isTransferAll.value = true
+                    } else {
+                      LoggerTools.logActions(globalScene.currentBattle.waveIndex, `** Transfer ${itemQuantity > 1 ? itemQuantity + " " : ""}${itemModifier.type.name} | ${party[fromSlotIndex].name} > ${party[toSlotIndex].name} **`)
+                    }
+                  }
                 } else {
                   globalScene.ui.setMode(Mode.MODIFIER_SELECT, this.isPlayer(), this.typeOptions, modifierSelectCallback, this.getRerollCost(globalScene.lockModifierTiers));
                 }

@@ -1985,12 +1985,12 @@ export const tierNames = [
  * @param modifierOverride
  * @returns
  */
-export function shinyCheckStep(predictionCost: Utils.IntegerHolder, rerollOverride: integer, modifierOverride?: integer) {
+export function shinyCheckStep(predictionCost: Utils.NumberHolder, rerollOverride: integer, modifierOverride?: integer) {
   var minLuck = -1
   var modifierPredictions: ModifierTypeOption[][] = []
   const party = globalScene.getPlayerParty();
   regenerateModifierPoolThresholds(party, ModifierPoolType.PLAYER, rerollOverride);
-  const modifierCount = new Utils.IntegerHolder(3);
+  const modifierCount = new Utils.NumberHolder(3);
   globalScene.applyModifiers(ExtraModifierModifier, true, modifierCount);
   if (modifierOverride) {
     //modifierCount.value = modifierOverride
@@ -2027,7 +2027,7 @@ export function runShinyCheck(mode: integer, wv?: integer) {
   } else {
     globalScene.resetSeed(wv);
   }
-  const predictionCost = new Utils.IntegerHolder(0)
+  const predictionCost = new Utils.NumberHolder(0)
   var isOk = true;
   for (var i = 0; predictionCost.value < globalScene.money && i < 8; i++) {
     var r = shinyCheckStep(predictionCost, i)
