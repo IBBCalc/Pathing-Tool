@@ -93,6 +93,10 @@ export class EnemyCommandPhase extends FieldPhase {
     const nextMove = enemyPokemon.getNextMove();
     const mv = new PokemonMove(nextMove.move);
 
+    if (trainer && trainer.shouldTera(enemyPokemon)) {
+      globalScene.currentBattle.preTurnCommands[this.fieldIndex + BattlerIndex.ENEMY] = { command: Command.TERA };
+    }
+
     globalScene.currentBattle.turnCommands[this.fieldIndex + BattlerIndex.ENEMY] =
       { command: Command.FIGHT, move: nextMove, skip: this.skipTurn };
     const targetLabels = [ "Counter", "[PLAYER L]", "[PLAYER R]", "[ENEMY L]", "[ENEMY R]" ];

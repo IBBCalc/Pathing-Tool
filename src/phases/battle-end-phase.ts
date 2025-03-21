@@ -95,6 +95,7 @@ export class BattleEndPhase extends BattlePhase {
     console.log(drpd);
     LoggerTools.save(drpd);
 
-    globalScene.updateModifiers().then(() => this.end());
+    globalScene.updateModifiers();
+    this.end();
   }
 }

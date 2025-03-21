@@ -94,6 +94,7 @@ export default class Battle {
   public started: boolean = false;
   public enemySwitchCounter: number = 0;
   public turn: number = 0;
+  public preTurnCommands: TurnCommands;
   public turnCommands: TurnCommands;
   public playerParticipantIds: Set<number> = new Set<number>();
   public battleScore: number = 0;
@@ -182,6 +183,7 @@ export default class Battle {
   incrementTurn(): void {
     this.turn++;
     this.turnCommands = Object.fromEntries(Utils.getEnumValues(BattlerIndex).map(bt => [ bt, null ]));
+    this.preTurnCommands = Object.fromEntries(Utils.getEnumValues(BattlerIndex).map(bt => [ bt, null ]));
     this.battleSeedState = null;
   }
 
@@ -203,7 +205,7 @@ export default class Battle {
   }
 
   pickUpScatteredMoney(): void {
-    const moneyAmount = new Utils.IntegerHolder(globalScene.currentBattle.moneyScattered);
+    const moneyAmount = new Utils.NumberHolder(globalScene.currentBattle.moneyScattered);
     globalScene.applyModifiers(MoneyMultiplierModifier, true, moneyAmount);
 
     if (globalScene.arena.getTag(ArenaTagType.HAPPY_HOUR)) {

@@ -37,5 +37,6 @@ export class PartyHealPhase extends BattlePhase {
         globalScene.ui.fadeIn(500).then(() => this.end());
       });
     });
+    globalScene.arena.playerTerasUsed = 0;
   }
 }

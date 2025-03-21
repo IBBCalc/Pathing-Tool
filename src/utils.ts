@@ -391,13 +391,6 @@ export class NumberHolder {
   }
 }
 
-/** @deprecated Use {@linkcode NumberHolder} */
-export class IntegerHolder extends NumberHolder {
-  constructor(value: number) {
-    super(value);
-  }
-}
-
 export class FixedInt {
   public readonly value: number;
 

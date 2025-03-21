@@ -45,6 +45,7 @@ export class Arena {
   public bgm: string;
   public ignoreAbilities: boolean;
   public ignoringEffectSource: BattlerIndex | null;
+  public playerTerasUsed: number;
   /**
    * Saves the number of times a party pokemon faints during a arena encounter.
    * {@linkcode globalScene.currentBattle.enemyFaints} is the corresponding faint counter for the enemy (this resets every wave).
@@ -64,6 +65,7 @@ export class Arena {
     this.bgm = bgm;
     this.trainerPool = biomeTrainerPools[biome];
     this.updatePoolsForTimeOfDay();
+    this.playerTerasUsed = 0;
     this.playerFaints = playerFaints;
   }
 
@@ -588,8 +590,8 @@ export class Arena {
 
     const newTag = getArenaTag(tagType, turnCount || 0, sourceMove, sourceId, targetIndex, side);
     if (newTag) {
-      this.tags.push(newTag);
       newTag.onAdd(this, quiet);
+      this.tags.push(newTag);
 
       const { layers = 0, maxLayers = 0 } = newTag instanceof ArenaTrapTag ? newTag : {};
 
