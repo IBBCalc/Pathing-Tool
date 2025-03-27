@@ -415,8 +415,11 @@ export default class FightUiHandler extends UiHandler implements InfoToggle {
     }
 
     var isGuaranteedCrit = target.isGuaranteedCrit(user, moveObj, true);
+    var isTera = user.isTerastallized;
+    user.isTerastallized = isTera ? isTera : this.fromCommand === Command.TERA; // If not yet terastallized, check if command wants to terastallize
     var dmgLow = target.getAttackDamage(user, moveObj, false, false, isGuaranteedCrit, true).damage * dmgRange;
     var dmgHigh = target.getAttackDamage(user, moveObj, false, false, isGuaranteedCrit, true).damage;
+    user.isTerastallized = isTera; // Revert to whatever the terastallize state was before
 
     if (this.logDamagePrediction) console.log(`Damage min: ${dmgLow} | Damage max: ${dmgHigh}`);
 
