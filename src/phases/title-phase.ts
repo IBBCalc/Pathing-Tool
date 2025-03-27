@@ -940,6 +940,10 @@ export class TitlePhase extends Phase {
 
     globals.forEach(g => {
       globalScene.RemoveModifiers();
+
+      // globalScene.InsertDynamaxBand();
+      // globalScene.InsertIVScanner();
+
       var rogueItem = g()
       mushroom.forEach(m => {
         var mu = {

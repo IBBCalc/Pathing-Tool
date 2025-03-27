@@ -8,7 +8,8 @@ import { allSpecies, getPokemonSpecies } from "#app/data/pokemon-species";
 import type { Constructor } from "#app/utils";
 import { isNullOrUndefined, randSeedInt } from "#app/utils";
 import * as Utils from "#app/utils";
-import type {
+import {
+  IvScannerModifier,
   Modifier,
   ModifierPredicate,
   TurnHeldItemTransferModifier,
@@ -1665,6 +1666,11 @@ export default class BattleScene extends SceneBase {
     this.addModifier(modifier, true, false, false, true);
   }
 
+  InsertIVScanner() {
+    let modifier = modifierTypes.IV_SCANNER().withIdFromFunc(modifierTypes.IV_SCANNER).newModifier() as IvScannerModifier
+    this.addModifier(modifier, true, false, false, true);
+  }
+
   RemoveModifiers() {
     var mods = this.modifiers.filter(m =>
       m instanceof HiddenAbilityRateBoosterModifier
@@ -1673,7 +1679,8 @@ export default class BattleScene extends SceneBase {
       || m instanceof MegaEvolutionAccessModifier
       || m instanceof GigantamaxAccessModifier
       || m instanceof TerastallizeAccessModifier
-      || m instanceof LockModifierTiersModifier);
+      || m instanceof LockModifierTiersModifier
+      || m instanceof IvScannerModifier);
     mods.forEach(m => {
       this.removeModifier(m);
     })
