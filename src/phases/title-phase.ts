@@ -1235,7 +1235,7 @@ export class TitlePhase extends Phase {
         if (enemy.species.speciesId > 1025) {
           // Using nicknames here because i want the getPokemonNameWithAffix so i have Wild/Foe information
           // Nicknames are stored in base 64? so convert btoa here
-          enemy.nickname = btoa(Species[atlaspath])
+          enemy.nickname = btoa(Species[enemy.species.speciesId])
         }
 
         // Always pyroar...
